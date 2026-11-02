@@ -1,0 +1,566 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>KH42 스테퍼 해부</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* layout: datasheet sheet — spec strip header, tab rail, sticky 3D stage beside a scrolling explanation panel */
+:root{
+  --paper:#EDEFEB;--sheet:#F9FAF7;--ink:#16191C;--ink-2:#50575C;--rule:#CDD2CC;--rule-strong:#A9B0AA;
+  --accent:#A24E1B;--on-accent:#FFFFFF;--tint:#F4E7DB;--ink3d:#1E2226;
+  --phA:#C8702E;--phB:#6A5BD8;--phC:#2F9A63;--north:#D24545;--south:#3A6FD0;--gold:#F0B030;
+  --flow:#FFC94D;--field:#E0663A;--copper:#B87333;--unused:#8D8F8C;--tape:#3B3F42;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;--ink3d:#D9DDD8;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;--ink3d:#D9DDD8;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{background:var(--sheet);border-bottom:1px solid var(--rule)}
+header.top .wrap{padding-block:28px 22px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--ink-2);margin:0}
+h1{font-size:clamp(26px,4.4vw,40px);font-weight:600;line-height:1.2;letter-spacing:-.01em;margin:8px 0 6px;text-wrap:balance}
+h1 .model{font-family:var(--f-mono);font-weight:500;letter-spacing:-.02em}
+.lede{margin:0 0 18px;color:var(--ink-2);max-width:62ch}
+.spec{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.spec li{display:flex;gap:8px;align-items:baseline;border:1px solid var(--rule);border-radius:6px;padding:5px 10px;background:var(--paper);font-size:13px}
+.spec span{color:var(--ink-2)}
+.spec b{font-family:var(--f-mono);font-weight:500;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:22px;overflow-x:auto;border-bottom:1px solid var(--rule);scrollbar-width:none}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:14px 0 10px;color:var(--ink-2);font:500 15px/1.3 var(--f-body);cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab:focus-visible,.btn:focus-visible,.seg button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:28px;padding-block:22px 56px}
+.stage-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;min-width:0}
+#stage{position:relative;height:clamp(360px,46vw,600px);border:1px solid var(--rule);border-radius:10px;background:var(--sheet);overflow:hidden;touch-action:none}
+#stage canvas{display:block}
+.fail{padding:24px;color:var(--ink-2)}
+.hint{font-size:13px;color:var(--ink-2);margin:8px 2px 0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px;color:var(--ink-2);margin:6px 2px 0;padding:0;list-style:none}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.panel{min-width:0}
+.panel h2{font-size:21px;font-weight:600;line-height:1.35;margin:0 0 8px;text-wrap:balance}
+.panel h3{font-size:16px;font-weight:600;margin:26px 0 8px}
+.panel p{margin:0 0 12px;max-width:64ch}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0;align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--rule-strong);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-left:1px solid var(--rule);background:var(--sheet);color:var(--ink-2);padding:8px 12px;font:500 14px var(--f-body);cursor:pointer;min-height:40px}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.btn{border:1px solid var(--rule-strong);background:var(--sheet);color:var(--ink);border-radius:8px;padding:8px 14px;font:500 14px var(--f-body);cursor:pointer;min-height:40px}
+.btn:hover,.seg button:hover{border-color:var(--ink-2)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.rate{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-2);margin-top:12px}
+.rate input{flex:1;max-width:220px;accent-color:var(--accent)}
+.rate output{font-family:var(--f-mono);color:var(--ink);min-width:2ch;text-align:right}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:16px 0 12px}
+.readout div{background:var(--sheet);padding:9px 12px;min-width:0}
+.readout span{display:block;font-size:12px;color:var(--ink-2)}
+.readout b{display:block;font-family:var(--f-mono);font-weight:500;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.readout .wide{grid-column:1/-1}
+.mode-note{font-size:14px;border-left:3px solid var(--accent);padding:2px 0 2px 12px;color:var(--ink)}
+.points{padding-left:20px;margin:0 0 12px}
+.points li{margin-bottom:8px;max-width:64ch}
+.note{border:1px solid var(--rule);border-radius:8px;background:var(--sheet);padding:10px 14px;font-size:14px;margin:12px 0}
+.note b{font-weight:600}
+.seq{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 0;padding:0;list-style:none}
+.seq li{font-family:var(--f-mono);font-size:13px;border:1px solid var(--rule);border-radius:999px;padding:2px 10px;color:var(--ink-2)}
+.seq li.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tbl{overflow-x:auto;margin:8px 0 4px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:460px}
+th,td{border-bottom:1px solid var(--rule);padding:8px 8px;text-align:left;vertical-align:top}
+thead th{font-weight:500;color:var(--ink-2);font-size:13px}
+tbody th{font-weight:500;color:var(--ink-2);white-space:nowrap}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.is-cur{background:var(--tint)}
+.badge{display:inline-block;font-size:11px;letter-spacing:.04em;background:var(--accent);color:var(--on-accent);border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:1px}
+.formula{font-family:var(--f-mono);font-size:15px;border:1px solid var(--rule);border-radius:8px;padding:10px 14px;background:var(--sheet);overflow-x:auto;white-space:nowrap}
+@media (max-width:880px){
+  .grid{grid-template-columns:minmax(0,1fr);gap:18px}
+  .stage-col{position:static}
+  #stage{height:clamp(320px,92vw,440px)}
+}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+
+<header class="top"><div class="wrap">
+  <p class="eyebrow">2상 하이브리드 스테핑 모터 · 라인트레이서 구동부</p>
+  <h1><span class="model">KH42JM2-901</span> 안을 들여다보기</h1>
+  <p class="lede">극과 톱니가 어떻게 1.8°를 만드는지, 선 6개 중 4개만 쓰면 무엇이 달라지는지, 2상과 3상은 어떻게 다른지 3D로 돌려 보면서 확인해 보세요.</p>
+  <ul class="spec">
+    <li><span>스텝각</span><b>1.8°</b></li>
+    <li><span>한 바퀴</span><b>200 스텝</b></li>
+    <li><span>결선</span><b>6선 유니폴라</b></li>
+    <li><span>정격 전류</span><b>1.2 A/상</b></li>
+    <li><span>반쪽 코일</span><b>2.85 Ω · 2.5 mH</b></li>
+    <li><span>크기</span><b>NEMA 17 · 42 mm</b></li>
+    <li><span>축</span><b>Ø5 mm</b></li>
+  </ul>
+</div></header>
+
+<div class="wrap">
+  <nav class="tabs" role="tablist" aria-label="보기 선택">
+    <button class="tab" role="tab" id="tab-0" aria-selected="true" aria-controls="pane-0">구조와 회전 원리</button>
+    <button class="tab" role="tab" id="tab-1" aria-selected="false" aria-controls="pane-1" tabindex="-1">6선 · 4선 연결</button>
+    <button class="tab" role="tab" id="tab-2" aria-selected="false" aria-controls="pane-2" tabindex="-1">2상 · 3상</button>
+  </nav>
+</div>
+
+<main class="wrap grid">
+  <section class="stage-col" aria-label="3D 모델">
+    <div id="stage"></div>
+    <p class="hint">드래그해서 돌리고, 휠이나 두 손가락으로 확대해요.</p>
+    <ul class="legend" id="legend-0">
+      <li><span class="sw" style="background:var(--phA)"></span>A상 코일</li>
+      <li><span class="sw" style="background:var(--phB)"></span>B상 코일</li>
+      <li><span class="sw" style="background:var(--north)"></span>N극</li>
+      <li><span class="sw" style="background:var(--south)"></span>S극</li>
+      <li><span class="sw" style="background:var(--gold)"></span>기준 톱니</li>
+    </ul>
+    <ul class="legend" id="legend-1" hidden>
+      <li><span class="sw" style="background:var(--flow)"></span>전류 흐름</li>
+      <li><span class="sw" style="background:var(--field)"></span>철심 안 자기장</li>
+      <li><span class="sw" style="background:var(--copper)"></span>쓰는 코일</li>
+      <li><span class="sw" style="background:var(--unused)"></span>안 쓰는 부분</li>
+      <li><span class="sw" style="background:var(--tape)"></span>절연한 선</li>
+    </ul>
+    <ul class="legend" id="legend-2" hidden>
+      <li><span class="sw" style="background:var(--phA)"></span>A상</li>
+      <li><span class="sw" style="background:var(--phB)"></span>B상</li>
+      <li><span class="sw" style="background:var(--phC)"></span>C상</li>
+      <li><span class="sw" style="background:var(--north)"></span>N극</li>
+      <li><span class="sw" style="background:var(--south)"></span>S극</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <div id="pane-0" role="tabpanel" aria-labelledby="tab-0">
+      <h2>극 8개와 톱니 50개가 1.8°를 만들어요</h2>
+      <p>고정자 극 8개가 로터를 둘러싸고 있어요. 홀수 번 극에는 A상, 짝수 번 극에는 B상 코일이 감겨 있어요. 전류가 들어간 극은 빨간색(N)이나 파란색(S)으로 바뀌어요.</p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="구동 방식">
+          <button id="h-wave" aria-pressed="false">1상 여자</button>
+          <button id="h-full" aria-pressed="true">2상 여자</button>
+          <button id="h-half" aria-pressed="false">하프스텝</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="h-prev">◀ 한 스텝</button>
+        <button class="btn" id="h-next">한 스텝 ▶</button>
+        <button class="btn primary" id="h-run" aria-pressed="false">연속 회전</button>
+        <button class="btn" id="h-zoom" aria-pressed="false">톱니 확대</button>
+      </div>
+      <label class="rate" for="h-rate">속도 <input type="range" id="h-rate" min="1" max="40" step="1" value="8"> <output id="h-rate-out" for="h-rate">8</output> 스텝/초</label>
+      <div class="readout">
+        <div><span>스텝</span><b id="h-step">0</b></div>
+        <div><span>축 각도</span><b id="h-angle">0.9°</b></div>
+        <div><span>A상 전류</span><b id="h-ia">+</b></div>
+        <div><span>B상 전류</span><b id="h-ib">+</b></div>
+      </div>
+      <p class="mode-note" id="h-note"></p>
+      <h3>왜 정확히 1.8°일까</h3>
+      <ul class="points">
+        <li>로터는 톱니가 50개 달린 컵 두 개와, 그 사이에 축 방향으로 자화된 영구자석으로 되어 있어요. 앞컵은 N, 뒷컵은 S예요.</li>
+        <li>두 컵의 톱니는 반 칸(3.6°) 어긋나 있어요. 극이 S가 되면 앞컵(N) 톱니가, 극이 N이 되면 뒷컵(S) 톱니가 그 극 아래로 끌려와 맞춰져요.</li>
+        <li>톱니 간격은 360° ÷ 50 = 7.2°예요. 1번 극과 2번 극은 45° 떨어져 있어서 톱니로 6.25칸이에요. 그래서 1번 극에 톱니가 맞춰진 순간 2번 극 아래 톱니는 1/4칸, 즉 1.8° 어긋나 있어요.</li>
+        <li>상을 바꿀 때마다 로터는 이 1/4칸만큼 움직여요. 360° ÷ (톱니 50개 × 4스텝) = 1.8°, 한 바퀴에 200스텝이에요.</li>
+      </ul>
+      <p class="note">노란 톱니 하나는 회전을 따라가기 쉽게 표시한 기준 톱니예요. <b>톱니 확대</b>로 1번 극 아래를 가까이 보면서 한 스텝씩 넘겨 보세요. 실제 모터는 극 하나에 톱니가 더 많고 비율도 조금 다르지만, 극 8개·로터 톱니 50개·반 칸 오프셋이라는 원리는 같아요. 스텝마다 로터가 살짝 흔들리며 멈추는 것도 실제 스테퍼가 저속에서 떨리는 이유예요.</p>
+    </div>
+
+    <div id="pane-1" role="tabpanel" aria-labelledby="tab-1" hidden>
+      <h2>6선 중 어떤 선을 쓰느냐가 곧 구동 방식이에요</h2>
+      <p>A·B 코일마다 가운데 탭(COM)이 있어서 선이 6개예요. 어떤 선을 쓰고 어떤 선을 절연하느냐에 따라 전류가 지나는 코일 길이와 방향이 달라져요. 자기장 화살표가 뒤집히는 방식을 비교해 보세요.</p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="연결 방식">
+          <button id="w-uni" aria-pressed="true">유니폴라 6선</button>
+          <button id="w-half" aria-pressed="false">하프코일 4선</button>
+          <button id="w-series" aria-pressed="false">직렬 4선</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="btn" id="w-prev">◀ 한 스텝</button>
+        <button class="btn" id="w-next">한 스텝 ▶</button>
+        <button class="btn primary" id="w-run" aria-pressed="false">자동 진행</button>
+      </div>
+      <ul class="seq" id="w-seq"><li>A+</li><li>B+</li><li>A−</li><li>B−</li></ul>
+      <div class="readout">
+        <div class="wide"><span>지금 전류 경로</span><b id="w-path"></b></div>
+        <div class="wide"><span>구동부</span><b id="w-drv"></b></div>
+      </div>
+      <p class="mode-note" id="w-feat"></p>
+      <h3>세 방식 한눈에</h3>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th data-col="uni">유니폴라 6선</th><th data-col="half">하프코일 4선<span class="badge">지금 계획</span></th><th data-col="series">직렬 4선</th></tr></thead>
+        <tbody>
+          <tr><th>쓰는 선</th><td data-col="uni">6개 전부</td><td data-col="half">A, A-COM, B, B-COM</td><td data-col="series">A, A', B, B'</td></tr>
+          <tr><th>전류가 지나는 코일</th><td data-col="uni">반쪽, 한 방향</td><td data-col="half">반쪽, 양방향</td><td data-col="series">전체, 양방향</td></tr>
+          <tr><th>저항 · 인덕턴스</th><td data-col="uni" class="num">2.85 Ω · 2.5 mH</td><td data-col="half" class="num">2.85 Ω · 2.5 mH</td><td data-col="series" class="num">5.7 Ω · 약 10 mH</td></tr>
+          <tr><th>전류 설정</th><td data-col="uni" class="num">1.2 A</td><td data-col="half" class="num">1.2 A (Vref ≈ 0.6 V)</td><td data-col="series" class="num">약 0.85 A (Vref ≈ 0.43 V)</td></tr>
+          <tr><th>구동부</th><td data-col="uni">저측 스위치 4개 + 전류 제한</td><td data-col="half">H-브리지 2개 (DRV8825)</td><td data-col="series">H-브리지 2개 (DRV8825)</td></tr>
+          <tr><th>저속 토크</th><td data-col="uni">기준</td><td data-col="half">기준과 비슷</td><td data-col="series">약 1.4배</td></tr>
+          <tr><th>고속 토크</th><td data-col="uni">좋음</td><td data-col="half">좋음</td><td data-col="series">빨리 떨어짐</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note">DRV8825 모듈에 따라 출력 핀이 1A·1B·2A·2B 대신 A1·A2·B1·B2로 적혀 있기도 해요. 회전 방향이 반대로 나오면 한 코일의 두 선만 서로 바꿔 꽂으면 돼요.</p>
+      <h3>내 모터 선 구분하기</h3>
+      <ol class="points">
+        <li>멀티미터를 저항(Ω) 모드로 두고 선을 두 개씩 재요.</li>
+        <li>서로 통하는 선 3개짜리 묶음이 두 개 나와요. 하나가 A 코일, 하나가 B 코일이에요. 다른 묶음끼리는 통하지 않아요.</li>
+        <li>묶음 안에서 나머지 두 선과 각각 약 2.85 Ω이 나오는 선이 COM이고, 양 끝끼리는 약 5.7 Ω이에요.</li>
+        <li>하프코일 4선으로 쓸 때는 묶음마다 COM과 끝 하나를 고르고, 남은 끝은 절연 테이프로 감아 두세요.</li>
+      </ol>
+    </div>
+
+    <div id="pane-2" role="tabpanel" aria-labelledby="tab-2" hidden>
+      <h2>상은 따로 전류를 흘리는 코일 묶음의 수예요</h2>
+      <p>극이 8개여도 늘 같은 전류가 흐르는 코일끼리는 한 상이에요. 내 모터는 A·B 두 묶음이라 2상이에요. 여기서는 원리를 보기 쉽게 로터를 막대자석 하나로 단순화해서 비교해요.</p>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="상 수">
+          <button id="p-2" aria-pressed="true">2상</button>
+          <button id="p-3" aria-pressed="false">3상</button>
+        </div>
+        <button class="btn" id="p-prev">◀ 한 스텝</button>
+        <button class="btn" id="p-next">한 스텝 ▶</button>
+        <button class="btn primary" id="p-run" aria-pressed="false">연속 회전</button>
+      </div>
+      <div class="readout">
+        <div><span>상 전류</span><b id="p-cur"></b></div>
+        <div><span>전기 한 주기</span><b id="p-cycle"></b></div>
+        <div><span>이 모델의 1스텝</span><b id="p-step"></b></div>
+        <div><span>톱니 50개 하이브리드라면</span><b id="p-hyb"></b></div>
+      </div>
+      <p class="formula">스텝각 = 360° ÷ (2 × 상 수 × 로터 톱니 수)</p>
+      <div class="tbl"><table>
+        <thead><tr><th></th><th>2상 (내 모터)</th><th>3상</th></tr></thead>
+        <tbody>
+          <tr><th>독립 코일 묶음</th><td>A, B</td><td>A, B, C</td></tr>
+          <tr><th>상 사이 전기각</th><td class="num">90°</td><td class="num">120°</td></tr>
+          <tr><th>전기 한 주기 스텝</th><td class="num">4</td><td class="num">6</td></tr>
+          <tr><th>톱니 50개일 때 스텝각</th><td class="num">1.8°</td><td class="num">1.2°</td></tr>
+          <tr><th>구동부</th><td>H-브리지 2개 (DRV8825)</td><td>하프브리지 3개</td></tr>
+          <tr><th>대표 예</th><td>KH42JM2-901, 28BYJ-48</td><td>3상 스테퍼, 드론 BLDC 모터</td></tr>
+        </tbody>
+      </table></div>
+      <p class="note"><b>"4상"이라는 표기</b> 28BYJ-48이나 ULN2003 모듈 상품명에 붙는 "4 Phase"는 반쪽 코일 4개를 따로 센 표기예요. 구조로는 가운데 탭이 달린 2상이고, KH42JM2-901이 6선인 것도 같은 이유예요.</p>
+      <p class="note"><b>드론과 이어지는 부분</b> 드론 BLDC 모터는 3상이에요. ESC 안에는 하프브리지 3개가 있어서 A·B·C 코일에 차례로 전류를 넣어 돌려요. 5상 스테퍼도 있는데, 같은 공식으로 360° ÷ (2 × 5 × 50) = 0.72°예요.</p>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const NAMES=['structure','wiring','phases'];
+const tabs=[0,1,2].map(i=>$('tab-'+i)), panes=[0,1,2].map(i=>$('pane-'+i)), legends=[0,1,2].map(i=>$('legend-'+i));
+let cur=0, views=null;
+function show(i){
+  cur=i;
+  tabs.forEach((t,j)=>{t.setAttribute('aria-selected',String(j===i));t.tabIndex=j===i?0:-1;});
+  panes.forEach((p,j)=>{p.hidden=j!==i;});
+  legends.forEach((l,j)=>{l.hidden=j!==i;});
+  if(views)views.forEach((v,j)=>{v.ctl.enabled=j===i;});
+}
+tabs.forEach((t,i)=>{
+  t.addEventListener('click',()=>show(i));
+  t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=(i+(e.key==='ArrowRight'?1:2))%3;tabs[n].focus();show(n);}});
+});
+const h0=(location.hash||'').slice(1);
+if(NAMES.indexOf(h0)>0)show(NAMES.indexOf(h0));
+
+const stage=$('stage');
+if(typeof THREE==='undefined'||!THREE.OrbitControls){stage.innerHTML='<p class="fail">3D 라이브러리를 불러오지 못했어요. 설명과 표는 그대로 볼 수 있어요.</p>';return;}
+let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}catch(e){stage.innerHTML='<p class="fail">이 브라우저에서는 3D 화면을 표시할 수 없어요. 설명과 표는 그대로 볼 수 있어요.</p>';return;}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setClearColor(0x000000,0);
+stage.appendChild(renderer.domElement);
+
+const D=Math.PI/180;
+const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const FONT='"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
+const PAL={A:0xC8702E,B:0x6A5BD8,C:0x2F9A63,N:0xD24545,S:0x3A6FD0,steel:0x868D92,copper:0xB87333,hot:0xF2A54A,flow:0xFFC94D,field:0xE0663A,tape:0x3B3F42,gold:0xF0B030};
+const PILL={amber:['#F6E3CC','#5A2E0B'],hot:['#FFD99E','#4A2508'],gray:['#DCDFDB','#3F4441'],N:['#F9D6D6','#7A1A1A'],S:['#D6E3FA','#123B7A'],A:['#F6E3CC','#5A2E0B'],B:['#E2DEFA','#2E2580'],C:['#D2EFE0','#14492F']};
+const GRAY=new THREE.Color(0x7d8184);
+const q=(x,t)=>x>t?1:x<-t?-1:0;
+const sgn=x=>x>0?'+':x<0?'−':'0';
+
+function std(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:.35,roughness:.55},o||{}));}
+function tone(m,hex,state){const c=new THREE.Color(hex);if(state==='on'){m.color.copy(c);m.emissive.copy(c);m.emissiveIntensity=.35;}else if(state==='idle'){m.color.copy(c);m.emissive.setHex(0);}else{m.color.copy(c).lerp(GRAY,.62);m.emissive.setHex(0);}}
+function lights(s){s.add(new THREE.HemisphereLight(0xffffff,0x5d6468,.8));const d=new THREE.DirectionalLight(0xffffff,.85);d.position.set(3,4,6);s.add(d);const d2=new THREE.DirectionalLight(0xffffff,.3);d2.position.set(-4,-3,-2);s.add(d2);}
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function drawPill(sp,text,pal){const u=sp.userData;if(u.text===text&&u.pal===pal)return;u.text=text;u.pal=pal;const cv=u.cv,g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);g.font='600 46px '+FONT;const w=Math.min(cv.width-8,g.measureText(text).width+48);g.fillStyle=pal[0];rr(g,(cv.width-w)/2,8,w,cv.height-16,24);g.fill();g.fillStyle=pal[1];g.textAlign='center';g.textBaseline='middle';g.fillText(text,cv.width/2,cv.height/2+2);u.tex.needsUpdate=true;}
+function pill(text,pal,h){const cv=document.createElement('canvas');cv.width=640;cv.height=96;const tex=new THREE.CanvasTexture(cv);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));sp.renderOrder=20;const hh=h||.3;sp.scale.set(hh*cv.width/cv.height,hh,1);sp.userData={cv,tex};drawPill(sp,text,pal);return sp;}
+function rrShape(w,h,r){const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s;}
+function coilGeo(ow,oh,iw,ih,thick){const s=rrShape(ow,oh,.12);s.holes.push(rrShape(iw,ih,.05));return new THREE.ExtrudeGeometry(s,{depth:thick,bevelEnabled:false,curveSegments:8});}
+function ringGeo(ro,ri,depth){const s=new THREE.Shape();s.absarc(0,0,ro,0,Math.PI*2,false);const h=new THREE.Path();h.absarc(0,0,ri,0,Math.PI*2,true);s.holes.push(h);return new THREE.ExtrudeGeometry(s,{depth:depth,bevelEnabled:false,curveSegments:72});}
+function arrow(len,col){const g=new THREE.Group();const m=std(col,{emissive:col,emissiveIntensity:.35,metalness:.1});const sh=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,len-.4,12),m);sh.rotation.z=Math.PI/2;sh.position.x=-.2;g.add(sh);const hd=new THREE.Mesh(new THREE.ConeGeometry(.17,.42,16),m);hd.rotation.z=-Math.PI/2;hd.position.x=len/2-.21;g.add(hd);return g;}
+function base(pos,tgt,fov){const v={scene:new THREE.Scene()};lights(v.scene);v.cam=new THREE.PerspectiveCamera(fov,1,.05,100);v.home={pos:pos,tgt:tgt};v.cam.position.copy(pos);const c=new THREE.OrbitControls(v.cam,renderer.domElement);c.enableDamping=true;c.dampingFactor=.08;c.enablePan=false;c.minDistance=.8;c.maxDistance=18;c.target.copy(tgt);c.enabled=false;c.update();v.ctl=c;return v;}
+function spring(o,dt){if(reduce){o.theta=o.target;o.omega=0;return;}const h=dt/4;for(let i=0;i<4;i++){const a=700*(o.target-o.theta)-28*o.omega;o.omega+=a*h;o.theta+=o.omega*h;}}
+function pressed(btn,on,onText,offText){btn.setAttribute('aria-pressed',String(on));btn.textContent=on?onText:offText;}
+function seg(ids,fn){ids.forEach(id=>{$(id).addEventListener('click',()=>{ids.forEach(j=>$(j).setAttribute('aria-pressed',String(j===id)));fn(id);});});}
+
+/* ---------- view 0: hybrid stepper ---------- */
+function buildHybrid(){
+  const v=base(new THREE.Vector3(2.3,1.9,6.9),new THREE.Vector3(0,.1,.4),36);
+  v.zoomView={pos:new THREE.Vector3(.42,1.02,2.05),tgt:new THREE.Vector3(0,.66,.75)};
+  const sc=v.scene;
+  const ring=new THREE.Mesh(ringGeo(2.0,1.45,1.6),std(PAL.steel,{metalness:.5,roughness:.45}));ring.position.z=-.8;sc.add(ring);
+  v.coil={A:std(PAL.A,{metalness:.55,roughness:.35}),B:std(PAL.B,{metalness:.55,roughness:.35})};
+  v.poleMat=[];v.poleTag=[];
+  const bodyGeo=new THREE.BoxGeometry(.44,.78,1.6),toothGeo=new THREE.BoxGeometry(.042,.07,1.6),cg=coilGeo(.74,2.0,.48,1.66,.46);
+  for(let i=0;i<8;i++){
+    const ang=(90+45*i)*D,g=new THREE.Group();g.rotation.z=ang-Math.PI/2;
+    const pm=std(PAL.steel,{metalness:.5,roughness:.45});v.poleMat.push(pm);
+    const body=new THREE.Mesh(bodyGeo,pm);body.position.y=1.13;g.add(body);
+    for(let j=-2;j<=2;j++){const a=(90+j*7.2)*D;const t=new THREE.Mesh(toothGeo,pm);t.position.set(.71*Math.cos(a),.71*Math.sin(a),0);t.rotation.z=a-Math.PI/2;g.add(t);}
+    const coil=new THREE.Mesh(cg,i%2===0?v.coil.A:v.coil.B);coil.rotation.x=-Math.PI/2;coil.position.y=.92;g.add(coil);
+    sc.add(g);
+    const tag=pill('N',PILL.N,.26);tag.position.set(1.18*Math.cos(ang),1.18*Math.sin(ang),1.25);tag.visible=false;sc.add(tag);v.poleTag.push(tag);
+    const num=pill((i+1)+'번 '+(i%2===0?'A':'B'),i%2===0?PILL.A:PILL.B,.22);num.position.set(2.62*Math.cos(ang),2.62*Math.sin(ang),.8);sc.add(num);
+  }
+  const rot=new THREE.Group();sc.add(rot);v.rotor=rot;
+  const cupN=std(0xB9A09C,{metalness:.55,roughness:.4}),cupS=std(0x9BA6B9,{metalness:.55,roughness:.4}),ref=std(PAL.gold,{emissive:0x7a4a00,emissiveIntensity:.6});
+  const cupGeo=new THREE.CylinderGeometry(.56,.56,.72,48),rt=new THREE.BoxGeometry(.036,.11,.72);
+  [[.42,cupN,0],[-.42,cupS,3.6]].forEach(function(d,ci){
+    const c=new THREE.Mesh(cupGeo,d[1]);c.rotation.x=Math.PI/2;c.position.z=d[0];rot.add(c);
+    for(let k=0;k<50;k++){const a=(90+d[2]+k*7.2)*D;const t=new THREE.Mesh(rt,(ci===0&&k===0)?ref:d[1]);t.position.set(.605*Math.cos(a),.605*Math.sin(a),d[0]);t.rotation.z=a-Math.PI/2;rot.add(t);}
+  });
+  const mg=new THREE.CylinderGeometry(.5,.5,.06,40);
+  const mN=new THREE.Mesh(mg,std(PAL.N));mN.rotation.x=Math.PI/2;mN.position.z=.03;rot.add(mN);
+  const mS=new THREE.Mesh(mg,std(PAL.S));mS.rotation.x=Math.PI/2;mS.position.z=-.03;rot.add(mS);
+  const shaft=new THREE.Mesh(new THREE.CylinderGeometry(.25,.25,4.0,32),std(0xC9CDD0,{metalness:.8,roughness:.25}));shaft.rotation.x=Math.PI/2;shaft.position.z=.8;rot.add(shaft);
+  const lN=pill('N컵',PILL.N,.2);lN.position.set(0,0,.82);rot.add(lN);
+  v.ink=new THREE.MeshBasicMaterial({color:0x222222});v.inkLine=new THREE.LineBasicMaterial({color:0x222222});
+  const needle=new THREE.Group();
+  const nd=new THREE.Mesh(new THREE.BoxGeometry(.03,1.95,.03),v.ink);nd.position.set(0,1.28,1.78);needle.add(nd);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,.06,20),v.ink);hub.rotation.x=Math.PI/2;hub.position.z=1.78;needle.add(hub);
+  rot.add(needle);
+  const pts=[];for(let k=0;k<200;k++){const a=(90+k*1.8)*D;const r2=k%50===0?2.36:k%10===0?2.27:2.17;pts.push(2.08*Math.cos(a),2.08*Math.sin(a),1.78,r2*Math.cos(a),r2*Math.sin(a),1.78);}
+  const lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+  const dial=new THREE.LineSegments(lg,v.inkLine);sc.add(dial);
+  v.gauge=[needle,dial];
+  v.mode='full';v.k=0;v.theta=.9;v.omega=0;v.target=.9;v.run=false;v.rate=8;v.acc=0;v.zoomed=false;
+  v.elec=function(){return v.mode==='wave'?90*v.k:v.mode==='full'?45+90*v.k:45*v.k;};
+  const NOTE={
+    wave:'1상 여자: 한 번에 한 상만 켜요. 전력은 적게 들지만 토크가 가장 약해요. 스텝은 1.8°예요.',
+    full:'2상 여자: 두 상을 동시에 켜서 로터가 두 극 사이, 0.9° 어긋난 자리에 멈춰요. DRV8825 풀스텝 모드가 이 방식이에요. 스텝은 1.8°예요.',
+    half:'하프스텝: 1상과 2상을 번갈아 켜서 0.9°씩 움직여요. 한 바퀴에 400스텝이에요. DRV8825는 마이크로스텝 설정으로 1/32까지 더 잘게 나눌 수 있어요.'};
+  v.apply=function(){
+    const e=v.elec(),IA=q(Math.cos(e*D),.3),IB=q(Math.sin(e*D),.3);v.target=e/50;
+    for(let i=0;i<8;i++){
+      const ph=i%2===0?IA:IB,b=(i%4===0||i%4===1)?1:-1,pol=ph*b,m=v.poleMat[i],tg=v.poleTag[i];
+      if(pol===0){tone(m,PAL.steel,'idle');tg.visible=false;}
+      else{tone(m,pol>0?PAL.S:PAL.N,'on');m.emissiveIntensity=.25;tg.visible=true;drawPill(tg,pol>0?'S':'N',pol>0?PILL.S:PILL.N);}
+    }
+    tone(v.coil.A,PAL.A,IA?'on':'dim');tone(v.coil.B,PAL.B,IB?'on':'dim');
+    const mech=((e/50)%360+360)%360;
+    $('h-step').textContent=String(v.k);
+    $('h-angle').textContent=mech.toFixed(1)+'°';
+    $('h-ia').textContent=IA>0?'+  1·5번 S, 3·7번 N':IA<0?'−  1·5번 N, 3·7번 S':'0  꺼짐';
+    $('h-ib').textContent=IB>0?'+  2·6번 S, 4·8번 N':IB<0?'−  2·6번 N, 4·8번 S':'0  꺼짐';
+    $('h-note').textContent=NOTE[v.mode];
+  };
+  v.update=function(dt){if(v.run){v.acc+=dt*v.rate;let n=0;while(v.acc>=1&&n<8){v.acc-=1;v.k++;n++;v.apply();}}spring(v,dt);v.rotor.rotation.z=v.theta*D;};
+  seg(['h-wave','h-full','h-half'],function(id){
+    const e=v.elec();v.mode=id.slice(2);
+    v.k=v.mode==='wave'?Math.round(e/90):v.mode==='full'?Math.round((e-45)/90):Math.round(e/45);v.apply();
+  });
+  $('h-next').addEventListener('click',function(){v.k++;v.apply();});
+  $('h-prev').addEventListener('click',function(){v.k--;v.apply();});
+  $('h-run').addEventListener('click',function(){v.run=!v.run;v.acc=0;pressed(this,v.run,'정지','연속 회전');});
+  $('h-rate').addEventListener('input',function(){v.rate=+this.value;$('h-rate-out').textContent=this.value;});
+  $('h-zoom').addEventListener('click',function(){v.zoomed=!v.zoomed;pressed(this,v.zoomed,'전체 보기','톱니 확대');v.gauge.forEach(g=>g.visible=!v.zoomed);fly(v,v.zoomed?v.zoomView:homeFor(v));});
+  v.onFit=function(){v.zoomed=false;pressed($('h-zoom'),false,'전체 보기','톱니 확대');v.gauge.forEach(g=>g.visible=true);};
+  v.apply();return v;
+}
+
+/* ---------- view 1: wiring of the center-tapped coils ---------- */
+function buildWiring(){
+  const v=base(new THREE.Vector3(.7,.25,8.4),new THREE.Vector3(0,-.12,0),42);
+  const sc=v.scene,R=.58;
+  class Hx extends THREE.Curve{constructor(a,b,y,s){super();this.a=a;this.b=b;this.y=y;this.s=s;}getPoint(u,o){o=o||new THREE.Vector3();const t=this.a+(this.b-this.a)*u,th=2*Math.PI*12*t;return o.set(-1.8+3.6*t,this.y+this.s*R*Math.cos(th),this.s*R*Math.sin(th));}}
+  v.coils=[];
+  [['A',1.0,1],['B',-1.2,-1]].forEach(function(d){
+    const n=d[0],y=d[1],s=d[2],c={n:n,y:y,s:s};
+    const core=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,4.4,32),new THREE.MeshStandardMaterial({color:0x8a9196,transparent:true,opacity:.35,depthWrite:false}));core.rotation.z=Math.PI/2;core.position.y=y;sc.add(core);
+    c.full=new Hx(0,1,y,s);
+    c.matL=std(PAL.copper,{metalness:.55,roughness:.35});c.matR=std(PAL.copper,{metalness:.55,roughness:.35});
+    sc.add(new THREE.Mesh(new THREE.TubeGeometry(new Hx(0,.5,y,s),360,.055,8,false),c.matL));
+    sc.add(new THREE.Mesh(new THREE.TubeGeometry(new Hx(.5,1,y,s),360,.055,8,false),c.matR));
+    c.leads=[];
+    [1.8,0,-1.8].forEach(function(x){
+      const m=std(PAL.copper,{metalness:.55,roughness:.35});
+      const L=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.7,10),m);L.position.set(x,y+s*(R+.35),0);sc.add(L);
+      const tape=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,.18,14),std(PAL.tape,{roughness:.9,metalness:0}));tape.position.set(x,y+s*(R+.66),0);tape.visible=false;sc.add(tape);
+      const tg=pill(n,PILL.amber,.27);tg.position.set(x,y+s*(R+1.02),0);sc.add(tg);
+      c.leads.push({m:m,tape:tape,tg:tg});
+    });
+    c.arrow=arrow(4.0,PAL.field);c.arrow.position.y=y;sc.add(c.arrow);
+    c.nTag=pill('N',PILL.N,.26);c.sTag=pill('S',PILL.S,.26);sc.add(c.nTag);sc.add(c.sTag);
+    const nm=pill(n+' 코일',n==='A'?PILL.A:PILL.B,.27);nm.position.set(-3.05,y,0);sc.add(nm);
+    c.ps=[];const pm=new THREE.MeshBasicMaterial({color:PAL.flow});
+    for(let i=0;i<24;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(.07,10,10),pm);p.visible=false;sc.add(p);c.ps.push(p);}
+    v.coils.push(c);
+  });
+  const SEQ=[['A',1],['B',1],['A',-1],['B',-1]];
+  const FEAT={
+    uni:'유니폴라 6선: COM 두 개를 +12V에 묶고, 끝 4개를 GND 쪽 스위치로 하나씩 켜요. 전류 방향은 늘 COM에서 끝으로 같고, 어느 쪽 절반을 켜느냐로 자기장이 뒤집혀요. 회로는 단순하지만 코일을 절반씩만 써요.',
+    half:'하프코일 4선: 끝 하나(A′, B′)를 절연하고 COM과 남은 끝만 DRV8825에 연결해요. 같은 절반 코일에 전류 방향을 바꿔 흘려서 자기장을 뒤집어요. 인덕턴스가 작아 고속에서 토크가 잘 유지돼요.',
+    series:'직렬 4선: COM을 절연하고 양 끝만 연결해서 코일 전체를 써요. 감은 수가 2배라 같은 발열에서 저속 토크는 약 1.4배지만, 인덕턴스가 4배라 고속에서 전류가 차오르지 못해 토크가 빨리 떨어져요.'};
+  const DRV={uni:'저측 스위치 4개 + 전류 제한 (ULN2003A는 1.2 A를 감당 못 함)',half:'DRV8825, 전류 1.2 A (Vref ≈ 0.6 V)',series:'DRV8825, 전류 약 0.85 A (Vref ≈ 0.43 V)'};
+  v.mode='uni';v.k=0;v.run=false;v.acc=0;v.t=0;
+  function tagText(mode,n,idx){const P=n==='A'?['1A','1B']:['2A','2B'],nm=[n,n+'-COM',n+'′'][idx];
+    if(mode==='uni')return nm+(idx===1?' → +12V':' → 스위치');
+    if(mode==='half')return idx===2?nm+' 절연':nm+' → '+(idx===1?P[0]:P[1]);
+    return idx===1?nm+' 절연':nm+' → '+(idx===2?P[0]:P[1]);}
+  v.apply=function(){
+    const st=SEQ[((v.k%4)+4)%4],mode=v.mode;
+    v.coils.forEach(function(c){
+      const d=c.n===st[0]?st[1]:0;
+      const usedL=mode!=='half',usedR=true;
+      const actL=mode==='uni'?d<0:mode==='series'?d!==0:false;
+      const actR=mode==='uni'?d>0:d!==0;
+      tone(c.matL,actL?PAL.hot:PAL.copper,actL?'on':usedL?'idle':'dim');
+      tone(c.matR,actR?PAL.hot:PAL.copper,actR?'on':usedR?'idle':'dim');
+      const ins=mode==='half'?2:mode==='series'?1:-1;
+      let carry=[];
+      if(d!==0){if(mode==='uni')carry=[1,d>0?0:2];else if(mode==='half')carry=[0,1];else carry=[0,2];}
+      c.leads.forEach(function(l,idx){
+        const isIns=idx===ins,isOn=carry.indexOf(idx)>=0;
+        tone(l.m,isOn?PAL.hot:PAL.copper,isOn?'on':isIns?'dim':'idle');
+        l.tape.visible=isIns;
+        drawPill(l.tg,tagText(mode,c.n,idx),isIns?PILL.gray:isOn?PILL.hot:PILL.amber);
+      });
+      c.arrow.visible=d!==0;c.arrow.rotation.y=d<0?Math.PI:0;
+      c.nTag.visible=c.sTag.visible=d!==0;
+      c.nTag.position.set(d<0?-2.55:2.55,c.y,0);c.sTag.position.set(d<0?2.55:-2.55,c.y,0);
+      c.flow=d===0?null:mode==='uni'?(d>0?[.5,1]:[.5,0]):mode==='half'?(d>0?[.5,1]:[1,.5]):(d>0?[0,1]:[1,0]);
+      c.ps.forEach(function(p){p.visible=!!c.flow;});
+    });
+    const n=st[0],d=st[1];
+    let path;
+    if(mode==='uni')path=n+'-COM(+12V) → '+(d>0?n:n+'′')+' → 스위치 → GND · '+(d>0?'오른쪽':'왼쪽')+' 절반';
+    else if(mode==='half')path=(d>0?n+'-COM → '+n:n+' → '+n+'-COM')+' · 오른쪽 절반, '+(d>0?'정방향':'역방향');
+    else path=(d>0?n+'′ → '+n+'-COM → '+n:n+' → '+n+'-COM → '+n+'′')+' · 코일 전체, '+(d>0?'정방향':'역방향');
+    $('w-path').textContent=path;
+    $('w-drv').textContent=DRV[mode];
+    $('w-feat').textContent=FEAT[mode];
+    Array.prototype.forEach.call($('w-seq').children,function(li,i){li.classList.toggle('on',i===((v.k%4)+4)%4);});
+    document.querySelectorAll('#pane-1 [data-col]').forEach(function(el){el.classList.toggle('is-cur',el.getAttribute('data-col')===mode);});
+  };
+  v.update=function(dt){
+    if(v.run){v.acc+=dt;if(v.acc>=1.6){v.acc=0;v.k++;v.apply();}}
+    v.t+=dt*(reduce?.08:.25);
+    v.coils.forEach(function(c){if(!c.flow)return;const a=c.flow[0],b=c.flow[1],N=c.ps.length;c.ps.forEach(function(p,i){const u=(v.t+i/N)%1;c.full.getPoint(a+(b-a)*u,p.position);});});
+  };
+  seg(['w-uni','w-half','w-series'],function(id){v.mode=id.slice(2);v.apply();});
+  $('w-next').addEventListener('click',function(){v.k++;v.apply();});
+  $('w-prev').addEventListener('click',function(){v.k--;v.apply();});
+  $('w-run').addEventListener('click',function(){v.run=!v.run;v.acc=0;pressed(this,v.run,'정지','자동 진행');});
+  v.apply();return v;
+}
+
+/* ---------- view 2: 2-phase vs 3-phase (simplified PM rotor) ---------- */
+function buildPhase(){
+  const v=base(new THREE.Vector3(1.3,1.2,6.8),new THREE.Vector3(0,0,0),36);
+  const defs={2:{inc:90,ph:[['A',0,'A'],['B',90,'B']]},3:{inc:60,ph:[['A',0,'A'],['B',120,'B'],['C',240,'C']]}};
+  v.models={};
+  [2,3].forEach(function(m){
+    const g=new THREE.Group();v.scene.add(g);
+    const ring=new THREE.Mesh(ringGeo(2.0,1.5,.9),std(PAL.steel,{metalness:.5,roughness:.45}));ring.position.z=-.45;g.add(ring);
+    const md={g:g,poles:[],ph:defs[m].ph,inc:defs[m].inc,k:0,theta:90,omega:0,target:90};
+    const bodyGeo=new THREE.BoxGeometry(.5,.72,.9),shoeGeo=new THREE.BoxGeometry(m===2?.9:.66,.1,.9),cg=coilGeo(m===2?.84:.78,1.3,.54,.96,.38);
+    md.ph.forEach(function(p,pi){
+      const al=90+p[1];
+      [0,1].forEach(function(side){
+        const ang=(al+side*180)*D,pg=new THREE.Group();pg.rotation.z=ang-Math.PI/2;
+        const pm=std(PAL.steel,{metalness:.5,roughness:.45});
+        const b=new THREE.Mesh(bodyGeo,pm);b.position.y=1.2;pg.add(b);
+        const shoe=new THREE.Mesh(shoeGeo,pm);shoe.position.y=.89;pg.add(shoe);
+        const cm=std(PAL[p[2]],{metalness:.55,roughness:.35});const c=new THREE.Mesh(cg,cm);c.rotation.x=-Math.PI/2;c.position.y=1.0;pg.add(c);
+        g.add(pg);
+        const tag=pill('N',PILL.N,.26);tag.position.set(1.2*Math.cos(ang),1.2*Math.sin(ang),.75);tag.visible=false;g.add(tag);
+        const lb=pill(p[0]+'상',PILL[p[2]],.22);lb.position.set(2.4*Math.cos(ang),2.4*Math.sin(ang),.2);g.add(lb);
+        md.poles.push({pm:pm,cm:cm,tag:tag,pi:pi,side:side,key:p[2]});
+      });
+    });
+    const rot=new THREE.Group();g.add(rot);
+    const hs=new THREE.Shape();hs.moveTo(.8,0);hs.absarc(0,0,.8,0,Math.PI,false);hs.lineTo(.8,0);
+    const hg=new THREE.ExtrudeGeometry(hs,{depth:.7,bevelEnabled:false,curveSegments:32});
+    const nH=new THREE.Mesh(hg,std(PAL.N,{metalness:.2,roughness:.5}));nH.position.z=-.35;rot.add(nH);
+    const sH=new THREE.Mesh(hg,std(PAL.S,{metalness:.2,roughness:.5}));sH.rotation.z=Math.PI;sH.position.z=-.35;rot.add(sH);
+    const sf=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,1.6,20),std(0xC9CDD0,{metalness:.8,roughness:.25}));sf.rotation.x=Math.PI/2;sf.position.z=.3;rot.add(sf);
+    const tN=pill('N',PILL.N,.24);tN.position.set(0,.45,.5);rot.add(tN);
+    const tS=pill('S',PILL.S,.24);tS.position.set(0,-.45,.5);rot.add(tS);
+    md.rot=rot;g.visible=m===2;v.models[m]=md;
+  });
+  v.m=2;v.run=false;v.acc=0;
+  v.apply=function(){
+    const md=v.models[v.m],e=md.inc*md.k;
+    const I=md.ph.map(function(p){return q(Math.cos((e-p[1])*D),.6);});
+    let x=0,y=0;md.ph.forEach(function(p,i){const al=(90+p[1])*D;x+=I[i]*Math.cos(al);y+=I[i]*Math.sin(al);});
+    const ang=Math.atan2(y,x)/D,tn=((md.target%360)+360)%360;let dd=ang-tn;dd=((dd+540)%360)-180;md.target+=dd;
+    md.poles.forEach(function(p){
+      const Ii=I[p.pi],pol=p.side===0?Ii:-Ii;
+      if(pol===0){tone(p.pm,PAL.steel,'idle');p.tag.visible=false;}
+      else{tone(p.pm,pol>0?PAL.S:PAL.N,'on');p.pm.emissiveIntensity=.25;p.tag.visible=true;drawPill(p.tag,pol>0?'S':'N',pol>0?PILL.S:PILL.N);}
+      tone(p.cm,PAL[p.key],Ii!==0?'on':'dim');
+    });
+    $('p-cur').textContent=md.ph.map(function(p,i){return p[0]+' '+sgn(I[i]);}).join(' · ');
+    $('p-cycle').textContent=(360/md.inc)+' 스텝';
+    $('p-step').textContent=md.inc+'°';
+    $('p-hyb').textContent=v.m===2?'1.8° · 200 스텝/회전':'1.2° · 300 스텝/회전';
+  };
+  v.update=function(dt){const md=v.models[v.m];if(v.run){v.acc+=dt;if(v.acc>=.7){v.acc=0;md.k++;v.apply();}}spring(md,dt);md.rot.rotation.z=(md.theta-90)*D;};
+  seg(['p-2','p-3'],function(id){v.m=+id.slice(2);v.models[2].g.visible=v.m===2;v.models[3].g.visible=v.m===3;const md=v.models[v.m];md.k=0;md.target=90;md.theta=90;md.omega=0;v.apply();});
+  $('p-next').addEventListener('click',function(){v.models[v.m].k++;v.apply();});
+  $('p-prev').addEventListener('click',function(){v.models[v.m].k--;v.apply();});
+  $('p-run').addEventListener('click',function(){v.run=!v.run;v.acc=0;pressed(this,v.run,'정지','연속 회전');});
+  v.apply();return v;
+}
+
+/* ---------- camera fitting, theme, loop ---------- */
+function homeFor(v){const a=v.cam.aspect,k=a<1.25?Math.min(1.6,1.25/a):1;return{pos:v.home.pos.clone().sub(v.home.tgt).multiplyScalar(k).add(v.home.tgt),tgt:v.home.tgt.clone()};}
+function fly(v,to){v.fly={from:{pos:v.cam.position.clone(),tgt:v.ctl.target.clone()},to:to,t:reduce?1:0};}
+function flyStep(v,dt){const f=v.fly;f.t=Math.min(1,f.t+dt/.7);const e=f.t<.5?2*f.t*f.t:1-Math.pow(-2*f.t+2,2)/2;v.cam.position.lerpVectors(f.from.pos,f.to.pos,e);v.ctl.target.lerpVectors(f.from.tgt,f.to.tgt,e);if(f.t>=1)v.fly=null;}
+let lastW=0,lastH=0;
+function size(){
+  const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h||(w===lastW&&h===lastH))return;lastW=w;lastH=h;
+  renderer.setSize(w,h);
+  views.forEach(function(v){v.cam.aspect=w/h;v.cam.updateProjectionMatrix();const hm=homeFor(v);v.cam.position.copy(hm.pos);v.ctl.target.copy(hm.tgt);v.fly=null;if(v.onFit)v.onFit();v.ctl.update();});
+}
+function themeSync(){
+  if(!views)return;const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink3d').trim()||'#1E2226';
+  try{views[0].ink.color.set(ink);views[0].inkLine.color.set(ink);}catch(e){}
+}
+const clock=new THREE.Clock();
+function loop(){
+  requestAnimationFrame(loop);
+  const dt=Math.min(clock.getDelta(),.05),v=views[cur];
+  v.update(dt);if(v.fly)flyStep(v,dt);v.ctl.update();renderer.render(v.scene,v.cam);
+}
+function init(){
+  views=[buildHybrid(),buildWiring(),buildPhase()];
+  views.forEach(function(v,j){v.ctl.enabled=j===cur;});
+  size();themeSync();
+  if(window.ResizeObserver)new ResizeObserver(size).observe(stage);else window.addEventListener('resize',size);
+  if(window.matchMedia){const mq=matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',themeSync);}
+  new MutationObserver(themeSync).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  loop();
+}
+const fontsReady=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
+Promise.race([fontsReady,new Promise(function(r){setTimeout(r,1500);})]).then(init);
+})();
+</script>
+
+</body></html>

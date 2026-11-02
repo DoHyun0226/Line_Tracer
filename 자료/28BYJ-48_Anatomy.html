@@ -1,0 +1,402 @@
+<title>28BYJ-48 해부</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+/* layout: datasheet sheet, sticky 3D stage beside a scrolling control and explanation panel */
+:root{
+  --paper:#EDEFEB;--sheet:#F9FAF7;--ink:#16191C;--ink-2:#50575C;--rule:#CDD2CC;--rule-strong:#A9B0AA;
+  --accent:#A24E1B;--on-accent:#FFFFFF;--tint:#F4E7DB;
+  --north:#D24545;--south:#3A6FD0;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pages{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.pages a{border:1px solid var(--rule-strong);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font:500 14px var(--f-body)}
+.pages a[aria-current="page"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pages a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{background:var(--sheet);border-bottom:1px solid var(--rule)}
+header.top .wrap{padding-block:26px 20px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--ink-2);margin:0}
+h1{font-size:clamp(26px,4.4vw,38px);font-weight:600;line-height:1.2;margin:8px 0 6px;text-wrap:balance}
+h1 span{font-family:var(--f-mono);font-weight:500}
+.lede{margin:0 0 16px;color:var(--ink-2);max-width:66ch}
+.spec{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.spec li{display:flex;gap:8px;align-items:baseline;border:1px solid var(--rule);border-radius:6px;padding:5px 10px;background:var(--paper);font-size:13px}
+.spec span{color:var(--ink-2)}
+.spec b{font-family:var(--f-mono);font-weight:500}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:26px;padding-block:20px 56px}
+.stage-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);align-self:start;min-width:0}
+#stage{position:relative;height:clamp(380px,50vw,640px);border:1px solid var(--rule);border-radius:10px;background:var(--sheet);overflow:hidden;touch-action:none}
+#stage canvas{display:block}
+.fail{padding:24px;color:var(--ink-2)}
+.hint{font-size:13px;color:var(--ink-2);margin:8px 2px 0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--ink-2);margin:6px 2px 0;padding:0;list-style:none}
+.sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.panel{min-width:0}
+.panel h2{font-size:18px;font-weight:600;margin:24px 0 8px}
+.panel h2:first-child{margin-top:0}
+.panel p{margin:0 0 12px;max-width:64ch}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;align-items:center}
+.btn{border:1px solid var(--rule-strong);background:var(--sheet);color:var(--ink);border-radius:8px;padding:7px 12px;font:500 14px var(--f-body);cursor:pointer;min-height:38px}
+.btn:hover{border-color:var(--ink-2)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.rate{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink-2);margin:8px 0}
+.rate input{flex:1;max-width:240px;accent-color:var(--accent)}
+.rate output{font-family:var(--f-mono);color:var(--ink);min-width:6ch;text-align:right}
+.layers{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:8px 0}
+.layers label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.layers input{accent-color:var(--accent)}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:12px 0}
+.readout div{background:var(--sheet);padding:8px 12px;min-width:0}
+.readout span{display:block;font-size:12px;color:var(--ink-2)}
+.readout b{display:block;font-family:var(--f-mono);font-weight:500;font-size:15px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.readout .wide{grid-column:1/-1}
+.tbl{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
+thead th{font-weight:500;color:var(--ink-2);font-size:13px}
+tr.on td{background:var(--tint)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;border:1px solid var(--rule-strong)}
+.points{padding-left:20px;margin:0 0 12px}
+.points li{margin-bottom:7px;max-width:64ch}
+.note{border:1px solid var(--rule);border-radius:8px;background:var(--sheet);padding:10px 14px;font-size:14px;margin:12px 0}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.stage-col{position:static}#stage{height:clamp(320px,92vw,460px)}}
+</style>
+
+<header class="top"><div class="wrap">
+  <nav class="pages" aria-label="페이지 선택"><a href="index.html" aria-current="page">28BYJ-48</a><a href="kh42.html">KH42JM2-901</a><a href="wiring.html">6선·5선·4선 결선</a></nav>
+  <p class="eyebrow">클로폴 영구자석 스텝모터 · ULN2003 구동 실습</p>
+  <h1><span>28BYJ-48</span> 안을 들여다보기</h1>
+  <p class="lede">링 코일 2개, 클로 32개, 16극 자석, 4단 기어가 한 스텝을 어떻게 만드는지 3D로 돌려 보면서 확인해 보세요.</p>
+  <ul class="spec">
+    <li><span>회전자 1스텝</span><b>11.25°</b></li>
+    <li><span>회전자 극</span><b>16 (8쌍)</b></li>
+    <li><span>기어비</span><b>약 1:63.68</b></li>
+    <li><span>출력축 1스텝</span><b>약 0.18°</b></li>
+    <li><span>결선</span><b>5선 유니폴라</b></li>
+    <li><span>전압</span><b>5 V 모델 기준</b></li>
+  </ul>
+</div></header>
+
+<main class="wrap grid">
+  <section class="stage-col" aria-label="3D 모델">
+    <div id="stage"></div>
+    <p class="hint">드래그해서 돌리고, 휠이나 두 손가락으로 확대해요.</p>
+    <ul class="legend">
+      <li><span class="sw" style="background:var(--north)"></span>N극</li>
+      <li><span class="sw" style="background:var(--south)"></span>S극</li>
+      <li><span class="sw" style="background:#FFC94D"></span>전류</li>
+      <li><span class="sw" style="background:#F2F0E6"></span>보빈</li>
+      <li><span class="sw" style="background:#F0B030"></span>기준 표시</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <h2>보기</h2>
+    <div class="controls" id="views">
+      <button class="btn" data-view="inside" aria-pressed="true">내부</button>
+      <button class="btn" data-view="outside" aria-pressed="false">외형</button>
+      <button class="btn" data-view="exploded" aria-pressed="false">분해</button>
+      <button class="btn" data-view="cut" aria-pressed="false">단면</button>
+      <button class="btn" data-view="claw" aria-pressed="false">클로 확대</button>
+    </div>
+    <label class="rate" for="explode">분해 <input type="range" id="explode" min="0" max="100" step="1" value="30"> <output id="explode-out" for="explode">30%</output></label>
+    <div class="layers" id="layers">
+      <label><input type="checkbox" id="l-case"> 케이스</label>
+      <label><input type="checkbox" id="l-iron" checked> 클로 철심</label>
+      <label><input type="checkbox" id="l-coil" checked> 코일</label>
+      <label><input type="checkbox" id="l-rotor" checked> 회전자</label>
+      <label><input type="checkbox" id="l-gear" checked> 기어</label>
+      <label><input type="checkbox" id="l-lead" checked> 전선</label>
+      <label><input type="checkbox" id="l-cut"> 단면 자르기</label>
+    </div>
+
+    <h2>구동</h2>
+    <div class="controls">
+      <button class="btn" id="d-full" aria-pressed="true">2상 여자</button>
+      <button class="btn" id="d-wave" aria-pressed="false">1상 여자</button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="prev">◀ 한 스텝</button>
+      <button class="btn" id="next">한 스텝 ▶</button>
+      <button class="btn primary" id="run" aria-pressed="false">연속 회전</button>
+    </div>
+    <label class="rate" for="rate">속도 <input type="range" id="rate" min="1" max="30" step="1" value="4"> <output id="rate-out" for="rate">4 스텝/초</output></label>
+    <div class="readout">
+      <div><span>스텝</span><b id="r-step">0</b></div>
+      <div><span>패턴</span><b id="r-pat">0x3</b></div>
+      <div class="wide"><span>켜진 입력</span><b id="r-on"></b></div>
+      <div><span>A 위 클로 / 아래 클로</span><b id="r-a"></b></div>
+      <div><span>B 위 클로 / 아래 클로</span><b id="r-b"></b></div>
+      <div><span>회전자 각도</span><b id="r-rot"></b></div>
+      <div><span>출력축 각도</span><b id="r-out"></b></div>
+    </div>
+
+    <h2>전선과 코일</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>선</th><th>연결 위치</th><th>구동</th></tr></thead>
+      <tbody id="wires">
+        <tr id="w-r"><td><span class="dot" style="background:#D8362F"></span>빨강</td><td>A, B 가닥이 만나는 공통점</td><td>+5V</td></tr>
+        <tr id="w-o"><td><span class="dot" style="background:#EE8A1E"></span>주황</td><td>A 코일 가닥 1 끝</td><td>IN1</td></tr>
+        <tr id="w-y"><td><span class="dot" style="background:#E8C72A"></span>노랑</td><td>B 코일 가닥 1 끝</td><td>IN2</td></tr>
+        <tr id="w-p"><td><span class="dot" style="background:#EE86B4"></span>분홍</td><td>A 코일 가닥 2 끝</td><td>IN3</td></tr>
+        <tr id="w-b"><td><span class="dot" style="background:#3F7FE0"></span>파랑</td><td>B 코일 가닥 2 끝</td><td>IN4</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">IN 번호와 선 색의 대응은 보드에 따라 다를 수 있어요. 주황·분홍이 한 코일, 노랑·파랑이 한 코일이라는 쌍은 그대로예요.</p>
+
+    <h2>어떻게 도는가</h2>
+    <ul class="points">
+      <li><b>코일은 축을 감싼 링이에요.</b> KH42처럼 극마다 감지 않고, 큰 링 코일 하나가 스택 전체를 자화해요.</li>
+      <li><b>가닥 2개를 나란히 감아요.</b> 두 가닥의 이음점이 빨강 선이에요. 전류가 빨강에서 어느 가닥으로 가느냐에 따라 링 주위를 도는 방향이 반대가 돼요.</li>
+      <li><b>클로가 극을 나눠 줘요.</b> 위판과 아래판 클로 8개씩이 번갈아 맞물려요. 코일이 켜지면 위판은 한 극, 아래판은 반대 극이 되어 16개 극이 둘레에 번갈아 나타나요.</li>
+      <li><b>회전자는 16극 자석이에요.</b> N과 S가 22.5°마다 바뀌고, 자석의 N극이 가까운 S 클로로 끌려가요.</li>
+      <li><b>두 스택은 11.25° 어긋나 있어요.</b> A와 B를 번갈아 켜면 안정 위치가 11.25°씩 옮겨 가요.</li>
+      <li><b>기어가 한 번 더 줄여요.</b> 회전자 11.25°는 출력축에서 약 0.18°예요. 그래서 STEPS_PER_PRESS가 1이면 거의 안 보여요.</li>
+    </ul>
+    <h2>각도 계산</h2>
+    <p>회전자 1스텝 = 360° ÷ (4 × 극쌍 8) = 11.25°</p>
+    <p>한 바퀴 = 32 × 63.68 ≈ 2038 풀스텝</p>
+    <p>기어비 = 32/9 × 22/11 × 26/9 × 31/10 ≈ 63.68</p>
+    <p class="note">원리를 보여 주는 모델이에요. 치수와 감은 수, 기어 배치는 단순화했어요. 실제 코일은 훨씬 많이 감겨 있고 두 스택의 조립 방향은 제품마다 다를 수 있어요. 판매 사양에 기어비를 1:64로 적는 경우도 있어요.</p>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const stage=$('stage');
+if(typeof THREE==='undefined'||!THREE.OrbitControls){stage.innerHTML='<p class="fail">3D 라이브러리를 불러오지 못했어요. 설명과 표는 그대로 볼 수 있어요.</p>';return;}
+let renderer;
+try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});}catch(e){stage.innerHTML='<p class="fail">이 브라우저에서는 3D 화면을 표시할 수 없어요. 설명과 표는 그대로 볼 수 있어요.</p>';return;}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setClearColor(0x000000,0);
+renderer.localClippingEnabled=true;
+stage.appendChild(renderer.domElement);
+
+const D=Math.PI/180,RATIO=(32/9)*(22/11)*(26/9)*(31/10);
+const reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+const FONT='"IBM Plex Sans KR","Malgun Gothic",sans-serif';
+const PAL={N:0xD24545,S:0x3A6FD0,steel:0x868D92,flow:0xFFC94D,gold:0xF0B030,bobbin:0xF2F0E6,gear:0xE7E3D6,brass:0xC9A24A,
+  red:0xD8362F,orange:0xEE8A1E,yellow:0xE8C72A,pink:0xEE86B4,blue:0x3F7FE0,can:0xB9BEC1};
+const GRAY=new THREE.Color(0x7d8184);
+const q=(x,t)=>x>t?1:x<-t?-1:0;
+const clip=new THREE.Plane(new THREE.Vector3(0,0,-1),1000),CL=[clip];
+function std(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:.35,roughness:.55,side:THREE.DoubleSide,clippingPlanes:CL},o||{}));}
+function tone(m,hex,on,dim){const c=new THREE.Color(hex);if(on){m.color.copy(c);m.emissive.copy(c);m.emissiveIntensity=.38;}else{m.color.copy(c);if(dim)m.color.lerp(GRAY,dim);m.emissive.setHex(0);}}
+
+const scene=new THREE.Scene();
+scene.add(new THREE.HemisphereLight(0xffffff,0x5d6468,.85));
+const d1=new THREE.DirectionalLight(0xffffff,.8);d1.position.set(30,45,50);scene.add(d1);
+const d2=new THREE.DirectionalLight(0xffffff,.3);d2.position.set(-40,-20,-20);scene.add(d2);
+const cam=new THREE.PerspectiveCamera(34,1,1,600);cam.position.set(56,44,94);
+const ctl=new THREE.OrbitControls(cam,renderer.domElement);ctl.enableDamping=true;ctl.dampingFactor=.08;ctl.enablePan=false;ctl.minDistance=14;ctl.maxDistance=190;ctl.target.set(4,10,0);
+
+function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function pill(text,bg,fg,h){const cv=document.createElement('canvas');cv.width=512;cv.height=96;const g=cv.getContext('2d');g.font='600 46px '+FONT;const w=Math.min(cv.width-8,g.measureText(text).width+48);g.fillStyle=bg;rr(g,(cv.width-w)/2,8,w,cv.height-16,24);g.fill();g.fillStyle=fg;g.textAlign='center';g.textBaseline='middle';g.fillText(text,cv.width/2,cv.height/2+2);const tex=new THREE.CanvasTexture(cv);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true}));sp.renderOrder=20;sp.scale.set(h*cv.width/cv.height,h,1);return sp;}
+function ringGeo(ro,ri,depth){const s=new THREE.Shape();s.absarc(0,0,ro,0,Math.PI*2,false);const h=new THREE.Path();h.absarc(0,0,ri,0,Math.PI*2,true);s.holes.push(h);const g=new THREE.ExtrudeGeometry(s,{depth:depth,bevelEnabled:false,curveSegments:64});g.rotateX(-Math.PI/2);return g;}
+function clawGeo(s){
+  const M=6,Y=6,rO=7.9,rI=7.35,h=6.9,pos=[],idx=[],L=2*(M+1);
+  for(let j=0;j<=Y;j++){const v=j/Y,half=(7.8*(1-v)+3*v)*D,y=s*h*v;
+    for(let i=0;i<=M;i++){const a=-half+2*half*i/M;pos.push(rO*Math.sin(a),y,rO*Math.cos(a));}
+    for(let i=M;i>=0;i--){const a=-half+2*half*i/M;pos.push(rI*Math.sin(a),y,rI*Math.cos(a));}}
+  for(let j=0;j<Y;j++)for(let i=0;i<L;i++){const a=j*L+i,b=j*L+(i+1)%L,c=(j+1)*L+i,d=(j+1)*L+(i+1)%L;idx.push(a,b,c,b,d,c);}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);const n=g.toNonIndexed();n.computeVertexNormals();return n;
+}
+function gearGeo(N,m,th){const s=new THREE.Shape(),ro=m*N/2+m*.8,rr2=m*N/2-m;for(let i=0;i<N;i++){const a=i/N*Math.PI*2,p=Math.PI*2/N,P=[[rr2,a],[rr2,a+p*.22],[ro,a+p*.32],[ro,a+p*.58],[rr2,a+p*.68]];P.forEach((e,j)=>{const x=e[0]*Math.cos(e[1]),y=e[0]*Math.sin(e[1]);(i===0&&j===0)?s.moveTo(x,y):s.lineTo(x,y);});}s.closePath();const g=new THREE.ExtrudeGeometry(s,{depth:th,bevelEnabled:false});g.rotateX(-Math.PI/2);return g;}
+function cyl(r,h,c,y,x,z,o){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,32,1,!!(o&&o.open)),c);m.position.set(x||0,y||0,z||0);return m;}
+
+const gCase=new THREE.Group(),gRot=new THREE.Group(),spin=new THREE.Group(),gGear=new THREE.Group(),gLead=new THREE.Group();
+scene.add(gCase,gRot,gGear,gLead);gRot.add(spin);
+
+/* stator stacks */
+const H=8.4,STACK={};
+const clawUp=clawGeo(1),clawDn=clawGeo(-1),plate=ringGeo(13.5,7.35,.6);
+class Strand extends THREE.Curve{
+  constructor(off,dy){super();this.off=off;this.dy=dy;}
+  getPoint(u,o){o=o||new THREE.Vector3();const a=this.off+Math.PI*2*18*u,f=(u*3)%1,tri=1-Math.abs(2*f-1),y=-3+6*tri+this.dy,r=9+3.1*Math.abs(2*u-1);return o.set(r*Math.sin(a),y,r*Math.cos(a));}
+}
+function buildStack(name,yc,off,c1,c2){
+  const g=new THREE.Group();g.position.y=yc;scene.add(g);
+  const iron=new THREE.Group(),coil=new THREE.Group();g.add(iron,coil);
+  const m1=std(PAL.steel,{metalness:.5,roughness:.45}),m2=std(PAL.steel,{metalness:.5,roughness:.45});
+  const p1=new THREE.Mesh(plate,m1);p1.position.y=H/2-.6;iron.add(p1);
+  const p2=new THREE.Mesh(plate,m2);p2.position.y=-H/2;iron.add(p2);
+  for(let k=0;k<8;k++){
+    const a=new THREE.Mesh(clawDn,m1);a.position.y=H/2-.6;a.rotation.y=(45*k+off)*D;iron.add(a);
+    const b=new THREE.Mesh(clawUp,m2);b.position.y=-H/2+.6;b.rotation.y=(45*k+22.5+off)*D;iron.add(b);
+  }
+  const bm=std(PAL.bobbin,{metalness:0,roughness:.7});
+  const sl=cyl(8.45,7,bm,0,0,0,{open:true});coil.add(sl);
+  const f1=new THREE.Mesh(ringGeo(12.7,8.45,.3),bm);f1.position.y=3.3;coil.add(f1);
+  const f2=new THREE.Mesh(ringGeo(12.7,8.45,.3),bm);f2.position.y=-3.6;coil.add(f2);
+  const strands=[[c1,90*D,-.15,-1],[c2,96*D,.15,1]].map(function(d){
+    const c=new Strand(d[1],d[2]),mat=std(d[0],{metalness:.45,roughness:.4});
+    coil.add(new THREE.Mesh(new THREE.TubeGeometry(c,900,.14,5,false),mat));
+    const pts=[];for(let i=0;i<=500;i++)pts.push(c.getPoint(i/500));
+    const dotMat=new THREE.MeshBasicMaterial({color:PAL.flow,clippingPlanes:CL}),dots=[];
+    for(let i=0;i<34;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(.26,8,8),dotMat);s.visible=false;coil.add(s);dots.push(s);}
+    return {curve:c,mat:mat,color:d[0],pts:pts,dots:dots,dir:d[3],on:false};
+  });
+  const tag=pill(name+' 스택',name==='A'?'#F6E3CC':'#F7EFC2',name==='A'?'#5A2E0B':'#4F4304',2.3);tag.position.set(-19,0,6);g.add(tag);
+  STACK[name]={g:g,yc:yc,m1:m1,m2:m2,strands:strands,iron:iron,coil:coil,off:off};
+}
+buildStack('A',4.6,0,PAL.orange,PAL.pink);
+buildStack('B',-4.6,11.25,PAL.yellow,PAL.blue);
+
+/* rotor */
+const mN=std(PAL.N,{metalness:.2,roughness:.5}),mS=std(PAL.S,{metalness:.2,roughness:.5});
+for(let k=0;k<16;k++){const w=new THREE.CylinderGeometry(6.9,6.9,17,8,1,false,(22.5*k-11.25)*D,22.5*D);spin.add(new THREE.Mesh(w,k%2===0?mN:mS));
+  const a=22.5*k*D,t=pill(k%2===0?'N':'S',k%2===0?'#F9D6D6':'#D6E3FA',k%2===0?'#7A1A1A':'#123B7A',1.3);t.material.depthTest=true;t.position.set(5.2*Math.sin(a),8.7,5.2*Math.cos(a));spin.add(t);}
+spin.add(cyl(1.4,29,std(0xC9CDD0,{metalness:.3,roughness:.4}),3.5));
+const refMark=new THREE.Mesh(new THREE.BoxGeometry(.7,.3,3),std(PAL.gold,{emissive:0x7a4a00,emissiveIntensity:.6}));refMark.position.set(0,8.65,3.3);spin.add(refMark);
+const m=.38,gm=std(PAL.gear,{metalness:.05,roughness:.6}),pm=std(PAL.brass,{metalness:.6,roughness:.35});
+const LV=[10.2,12,13.8,15.6];
+const pin0=new THREE.Mesh(gearGeo(9,m,1.2),pm);pin0.position.y=LV[0];spin.add(pin0);
+const rotorTag=pill('회전자',' #E2DEFA'.trim(),'#2E2580',2.3);rotorTag.position.set(-11,-11,8);gRot.add(rotorTag);
+
+/* gear train */
+const C=[[0,0]];[[7.8,200],[6.27,300],[6.65,20],[7.8,40]].forEach(function(s){const p=C[C.length-1];C.push([p[0]+s[0]*Math.cos(s[1]*D),p[1]+s[0]*Math.sin(s[1]*D)]);});
+const GEAR=[{N:32,pin:11,lv:0},{N:22,pin:9,lv:1},{N:26,pin:10,lv:2},{N:31,pin:0,lv:3}].map(function(d,i){
+  const g=new THREE.Group();g.position.set(C[i+1][0],0,C[i+1][1]);gGear.add(g);
+  const a=new THREE.Mesh(gearGeo(d.N,m,1.2),gm);a.position.y=LV[d.lv];g.add(a);
+  const mk=new THREE.Mesh(new THREE.BoxGeometry(.5,.25,1.8),std(PAL.gold));mk.position.set(0,LV[d.lv]+1.3,m*d.N/2-1.3);g.add(mk);
+  if(d.pin){const b=new THREE.Mesh(gearGeo(d.pin,m,1.2),pm);b.position.y=LV[d.lv+1];g.add(b);}
+  g.add(cyl(.55,8,std(0xC9CDD0,{metalness:.3,roughness:.4}),LV[d.lv]+2));
+  return g;
+});
+const out=GEAR[3];
+const hub=cyl(2.5,9,std(0xC9CDD0,{metalness:.3,roughness:.4}),21);out.add(hub);
+const fs=new THREE.Shape();for(let i=0;i<=48;i++){const a=i/48*Math.PI*2,x=2.5*Math.cos(a),y=Math.max(-1.5,Math.min(1.5,2.5*Math.sin(a)));i?fs.lineTo(x,y):fs.moveTo(x,y);}
+const fg=new THREE.ExtrudeGeometry(fs,{depth:6,bevelEnabled:false});fg.rotateX(-Math.PI/2);const fl=new THREE.Mesh(fg,std(0xD9DDDF,{metalness:.3,roughness:.4}));fl.position.y=25.5;out.add(fl);
+const gearTag=pill('기어 4단',' #EEEBDD'.trim(),'#3F4441',2.3);gearTag.position.set(-15,15,6);gGear.add(gearTag);
+
+/* case */
+const cm=std(PAL.can,{metalness:.65,roughness:.4});
+gCase.add(cyl(14,19.6,cm,0,0,0,{open:true}));
+gCase.add(new THREE.Mesh(ringGeo(14,0,.4),cm)).children;
+gCase.children[1].position.y=-10.2;
+const lm=std(0x9EA5A9,{metalness:.6,roughness:.45});
+gCase.add(cyl(14,9.4,lm,14.5,0,0,{open:true}));
+const lid=new THREE.Mesh(ringGeo(14,3.1,.5),lm);lid.position.y=19.2;gCase.add(lid);
+const boss=cyl(4.7,1.6,lm,20.3,C[4][0],C[4][1]);gCase.add(boss);
+const es=new THREE.Shape();es.moveTo(-21,-3.5);es.lineTo(21,-3.5);es.absarc(21,0,3.5,-Math.PI/2,Math.PI/2,false);es.lineTo(-21,3.5);es.absarc(-21,0,3.5,Math.PI/2,Math.PI*1.5,false);
+[-17.5,17.5].forEach(function(x){const h=new THREE.Path();h.absarc(x,0,2.1,0,Math.PI*2,true);es.holes.push(h);});
+const hc=new THREE.Path();hc.absarc(0,0,13.9,0,Math.PI*2,true);es.holes.push(hc);
+const eg=new THREE.ExtrudeGeometry(es,{depth:.8,bevelEnabled:false,curveSegments:40});eg.rotateX(-Math.PI/2);
+const ear=new THREE.Mesh(eg,lm);ear.position.y=18.4;gCase.add(ear);
+
+/* leads and connector */
+const CONN={blue:-3.6,pink:-1.8,yellow:0,orange:1.8,red:3.6};
+const conn=new THREE.Group();conn.position.set(36,0,0);scene.add(conn);
+conn.add(new THREE.Mesh(new THREE.BoxGeometry(5,3.4,11),std(0xF4F2EA,{metalness:0,roughness:.6})));
+const connTag=pill('커넥터 → ULN2003','#E7EAE5','#30363A',2.1);connTag.position.set(3,4.4,0);conn.add(connTag);
+const LM={};['red','orange','yellow','pink','blue'].forEach(function(k){LM[k]=std(PAL[k],{metalness:.2,roughness:.55});});
+const leadMeshes=[];
+function clearLeads(){leadMeshes.forEach(function(m){gLead.remove(m);m.geometry.dispose();});leadMeshes.length=0;}
+function worldEnd(st,i,u){const p=st.strands[i].curve.getPoint(u);p.y+=st.g.position.y;return p;}
+function tube(start,color,mid){const zc=CONN[color],pts=[start,new THREE.Vector3(start.x+2.2,start.y,start.z),mid||new THREE.Vector3(23,start.y*.35,zc*.8),new THREE.Vector3(33.4,0,zc)];
+  const m=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,.24,7,false),LM[color]);gLead.add(m);leadMeshes.push(m);}
+function buildLeads(){
+  clearLeads();const A=STACK.A,B=STACK.B;
+  tube(worldEnd(A,0,0),'orange');tube(worldEnd(A,1,1),'pink');tube(worldEnd(B,0,0),'yellow');tube(worldEnd(B,1,1),'blue');
+  const ta=worldEnd(A,0,1),tb=worldEnd(B,1,0),j=new THREE.Vector3(23,0,3);
+  tube(ta,'red',j);tube(tb,'red',j);
+}
+
+/* state */
+const S={mode:'full',k:0,theta:5.625,omega:0,target:5.625,run:false,rate:4,acc:0,ex:.3,t:0};
+const PATS=[];
+function elec(){return S.mode==='full'?45+90*S.k:90*S.k;}
+function setPolarity(st,I){const f=(m,p)=>p===0?tone(m,PAL.steel,false):(tone(m,p>0?PAL.S:PAL.N,true),m.emissiveIntensity=.25);f(st.m1,I);f(st.m2,-I);}
+function label(I){return I>0?'S / N':I<0?'N / S':'꺼짐';}
+function apply(){
+  const e=elec(),IA=q(Math.cos(e*D),.3),IB=q(Math.sin(e*D),.3);S.target=e/8;
+  setPolarity(STACK.A,IA);setPolarity(STACK.B,IB);
+  const flag=[[STACK.A,0,IA>0,'orange'],[STACK.A,1,IA<0,'pink'],[STACK.B,0,IB>0,'yellow'],[STACK.B,1,IB<0,'blue']];
+  flag.forEach(function(f){const s=f[0].strands[f[1]];s.on=f[2];tone(s.mat,s.color,f[2],f[2]?0:.55);s.dots.forEach(function(d){d.visible=f[2];});tone(LM[f[3]],PAL[f[3]],f[2],f[2]?0:.25);});
+  tone(LM.red,PAL.red,true);
+  const pat=(IA>0?1:0)|(IB>0?2:0)|(IA<0?4:0)|(IB<0?8:0),on=[];[1,2,4,8].forEach(function(b,i){if(pat&b)on.push('IN'+(i+1));});
+  $('r-step').textContent=String(S.k);$('r-pat').textContent='0x'+pat.toString(16).toUpperCase();$('r-on').textContent=on.join(', ');
+  $('r-a').textContent=label(IA);$('r-b').textContent=label(IB);
+  [['w-o',IA>0],['w-p',IA<0],['w-y',IB>0],['w-b',IB<0],['w-r',true]].forEach(function(r){$(r[0]).classList.toggle('on',r[1]);});
+}
+function setExplode(x){
+  S.ex=x;STACK.A.g.position.y=4.6+12*x;STACK.B.g.position.y=-4.6-12*x;gRot.position.x=-30*x;gGear.position.y=20*x;gCase.position.y=52*x;conn.position.y=0;buildLeads();
+  $('explode').value=Math.round(x*100);$('explode-out').textContent=Math.round(x*100)+'%';
+}
+function layer(id,on){
+  const v=!!on;
+  if(id==='case')gCase.visible=v;
+  if(id==='iron'){STACK.A.iron.visible=v;STACK.B.iron.visible=v;}
+  if(id==='coil'){STACK.A.coil.visible=v;STACK.B.coil.visible=v;}
+  if(id==='rotor')gRot.visible=v;
+  if(id==='gear')gGear.visible=v;
+  if(id==='lead'){gLead.visible=v;conn.visible=v;}
+  if(id==='cut')clip.constant=v?0:1000;
+}
+const LAYERS=['case','iron','coil','rotor','gear','lead','cut'];
+LAYERS.forEach(function(id){$('l-'+id).addEventListener('change',function(){layer(id,this.checked);});});
+const VIEWS={
+  inside:{l:{case:0,iron:1,coil:1,rotor:1,gear:1,lead:1,cut:0},ex:.3,pos:[56,44,94],tgt:[4,10,0]},
+  outside:{l:{case:1,iron:1,coil:1,rotor:1,gear:1,lead:1,cut:0},ex:0,pos:[50,46,84],tgt:[6,10,0]},
+  exploded:{l:{case:0,iron:1,coil:1,rotor:1,gear:1,lead:1,cut:0},ex:1,pos:[64,36,128],tgt:[0,10,0]},
+  cut:{l:{case:1,iron:1,coil:1,rotor:1,gear:1,lead:0,cut:1},ex:0,pos:[8,18,60],tgt:[0,6,0]},
+  claw:{l:{case:0,iron:1,coil:0,rotor:1,gear:0,lead:0,cut:0},ex:0,pos:[6,20,34],tgt:[0,1,0]}
+};
+let fly=null;
+function view(name){
+  const v=VIEWS[name];
+  LAYERS.forEach(function(id){const on=!!v.l[id];$('l-'+id).checked=on;layer(id,on);});
+  setExplode(v.ex);
+  document.querySelectorAll('#views .btn').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.view===name));});
+  fly={a:cam.position.clone(),b:new THREE.Vector3().fromArray(v.pos),c:ctl.target.clone(),d:new THREE.Vector3().fromArray(v.tgt),t:reduce?1:0};
+}
+document.querySelectorAll('#views .btn').forEach(function(b){b.addEventListener('click',function(){view(b.dataset.view);});});
+$('explode').addEventListener('input',function(){setExplode(+this.value/100);});
+function step(d){S.k+=d;apply();}
+$('next').addEventListener('click',function(){step(1);});
+$('prev').addEventListener('click',function(){step(-1);});
+$('run').addEventListener('click',function(){S.run=!S.run;S.acc=0;this.setAttribute('aria-pressed',String(S.run));this.textContent=S.run?'정지':'연속 회전';});
+$('rate').addEventListener('input',function(){S.rate=+this.value;$('rate-out').textContent=this.value+' 스텝/초';});
+function mode(m){const e=elec();S.mode=m;S.k=m==='full'?Math.round((e-45)/90):Math.round(e/90);$('d-full').setAttribute('aria-pressed',String(m==='full'));$('d-wave').setAttribute('aria-pressed',String(m==='wave'));apply();}
+$('d-full').addEventListener('click',function(){mode('full');});
+$('d-wave').addEventListener('click',function(){mode('wave');});
+
+function size(){const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;renderer.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();}
+const clock=new THREE.Clock();
+function frame(){
+  requestAnimationFrame(frame);
+  const dt=Math.min(clock.getDelta(),.05);
+  if(S.run){S.acc+=dt*S.rate;let n=0;while(S.acc>=1&&n<6){S.acc-=1;S.k++;n++;apply();}}
+  if(reduce){S.theta=S.target;S.omega=0;}else{const h=dt/4;for(let i=0;i<4;i++){const a=500*(S.target-S.theta)-34*S.omega;S.omega+=a*h;S.theta+=S.omega*h;}}
+  const r=S.theta*D;spin.rotation.y=r;
+  const w1=-r*9/32,w2=-w1*11/22,w3=-w2*9/26,w4=-w3*10/31;
+  GEAR[0].rotation.y=w1;GEAR[1].rotation.y=w2;GEAR[2].rotation.y=w3;GEAR[3].rotation.y=w4;
+  const norm=x=>((x%360)+360)%360;
+  $('r-rot').textContent=norm(S.theta).toFixed(2)+'°';$('r-out').textContent=norm(S.theta/RATIO).toFixed(2)+'°';
+  S.t+=dt*(reduce?.015:.05);
+  [STACK.A,STACK.B].forEach(function(st){st.strands.forEach(function(s){if(!s.on)return;const N=s.dots.length;s.dots.forEach(function(d,i){let u=(S.t+i/N)%1;if(s.dir<0)u=1-u;d.position.copy(s.pts[Math.round(u*500)]);});});});
+  if(fly){fly.t=Math.min(1,fly.t+dt/.7);const e=fly.t<.5?2*fly.t*fly.t:1-Math.pow(-2*fly.t+2,2)/2;cam.position.lerpVectors(fly.a,fly.b,e);ctl.target.lerpVectors(fly.c,fly.d,e);if(fly.t>=1)fly=null;}
+  ctl.update();renderer.render(scene,cam);
+}
+size();
+if(window.ResizeObserver)new ResizeObserver(size).observe(stage);else window.addEventListener('resize',size);
+layer('case',false);setExplode(.3);apply();frame();
+})();
+</script>

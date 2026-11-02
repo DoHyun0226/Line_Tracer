@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>스테퍼 결선 비교</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#EDEFEB;--sheet:#F9FAF7;--ink:#16191C;--ink-2:#50575C;--rule:#CDD2CC;--rule-strong:#A9B0AA;
+  --accent:#A24E1B;--on-accent:#FFFFFF;--tint:#F4E7DB;--wire:#6E767A;--flow:#EF9F27;--supply:#D8362F;--rotor:#6A5BD8;
+  --on-bg:#E1F5EE;--on-line:#0F6E56;--on-text:#085041;--off-bg:#ECEDE9;--off-line:#A9B0AA;--off-text:#50575C;--sup-bg:#FAECE7;--sup-line:#993C1D;--sup-text:#712B13;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;--wire:#A1A9A4;--rotor:#AFA9EC;
+  --on-bg:#085041;--on-line:#5DCAA5;--on-text:#E1F5EE;--off-bg:#262B2E;--off-line:#475057;--off-text:#A1A9A4;--sup-bg:#712B13;--sup-line:#F0997B;--sup-text:#FAECE7;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#101214;--sheet:#171A1D;--ink:#E6E9E5;--ink-2:#A1A9A4;--rule:#2C3236;--rule-strong:#475057;
+  --accent:#E3925A;--on-accent:#1B0F06;--tint:#2B2119;--wire:#A1A9A4;--rotor:#AFA9EC;
+  --on-bg:#085041;--on-line:#5DCAA5;--on-text:#E1F5EE;--off-bg:#262B2E;--off-line:#475057;--off-text:#A1A9A4;--sup-bg:#712B13;--sup-line:#F0997B;--sup-text:#FAECE7;color-scheme:dark}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.pages{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.pages a{border:1px solid var(--rule-strong);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font:500 14px var(--f-body)}
+.pages a[aria-current="page"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.pages a:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+header.top{background:var(--sheet);border-bottom:1px solid var(--rule)}
+header.top .wrap{padding-block:26px 20px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--ink-2);margin:0}
+h1{font-size:clamp(26px,4.4vw,38px);font-weight:600;line-height:1.2;margin:8px 0 6px;text-wrap:balance}
+.lede{margin:0;color:var(--ink-2);max-width:66ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:26px;padding-block:20px 56px}
+.stage-col{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);align-self:start;min-width:0}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:12px}
+.panel{min-width:0}
+h2{font-size:18px;font-weight:600;margin:24px 0 8px}
+.panel h2:first-child{margin-top:0}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
+.btn{border:1px solid var(--rule-strong);background:var(--sheet);color:var(--ink);border-radius:8px;padding:7px 12px;font:500 14px var(--f-body);cursor:pointer;min-height:38px}
+.btn:hover{border-color:var(--ink-2)}
+.btn[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--f-body);font-size:12px;fill:var(--ink-2)}
+svg text.b{font-size:14px;font-weight:600;fill:var(--ink)}
+.b-on rect{fill:var(--on-bg);stroke:var(--on-line)}.b-on text,.b-on text.b{fill:var(--on-text)}
+.b-off rect{fill:var(--off-bg);stroke:var(--off-line)}.b-off text,.b-off text.b{fill:var(--off-text)}
+.b-sup rect{fill:var(--sup-bg);stroke:var(--sup-line)}.b-sup text,.b-sup text.b{fill:var(--sup-text)}
+.cf{fill:none;stroke:var(--flow);stroke-width:4;stroke-dasharray:7 8;opacity:0}
+.cf.go{opacity:1}
+@keyframes cf{to{stroke-dashoffset:-30}}
+@media (prefers-reduced-motion:no-preference){.cf.go{animation:cf .8s linear infinite}.cf.go.rev{animation-direction:reverse}}
+#info{font-size:15px;margin-top:10px;padding:10px 12px;background:var(--tint);border-radius:8px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{border-bottom:1px solid var(--rule);padding:7px 8px;text-align:left;vertical-align:top}
+th{font-weight:500;color:var(--ink-2);font-size:13px}
+tr.cur td{background:var(--tint)}
+td.on{color:var(--on-line);font-weight:600}
+.points{padding-left:20px;margin:0}
+.points li{margin-bottom:7px;max-width:64ch}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.stage-col{position:static}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <nav class="pages" aria-label="페이지 선택"><a href="index.html">28BYJ-48</a><a href="kh42.html">KH42JM2-901</a><a href="wiring.html" aria-current="page">6선·5선·4선 결선</a></nav>
+  <p class="eyebrow">2상 스텝모터 결선 비교</p>
+  <h1>핀에서 코일까지 전류 따라가기</h1>
+  <p class="lede">6선 유니폴라, 5선 유니폴라, 4선 바이폴라에서 핀이 코일 어디에 연결되고, 스텝마다 전류가 어떻게 흐르는지 비교해 보세요.</p>
+</div></header>
+<main class="wrap grid">
+  <section class="stage-col" aria-label="결선 회로">
+    <div class="sheet">
+      <div class="controls" id="mS">
+        <button class="btn" data-m="m6">6선 유니폴라</button>
+        <button class="btn" data-m="m5">5선 유니폴라</button>
+        <button class="btn" data-m="m4">4선 바이폴라</button>
+      </div>
+      <div class="controls" id="dS">
+        <button class="btn" data-d="full">2상 여자</button>
+        <button class="btn" data-d="wave">1상 여자</button>
+      </div>
+      <div class="controls">
+        <button class="btn" id="prev">◀ 한 스텝</button>
+        <button class="btn" id="next">한 스텝 ▶</button>
+        <button class="btn primary" id="auto" aria-pressed="false">자동 진행</button>
+      </div>
+      <svg viewBox="0 0 680 424" id="sv" role="img" aria-label="코일, 가운데 탭, 드라이버 핀과 자기장 방향 회로도"></svg>
+      <div id="info" role="status"></div>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>핀 연결과 현재 상태</h2>
+    <div class="tbl"><table id="tW"></table></div>
+    <h2>스텝 순서</h2>
+    <div class="tbl"><table id="tS"></table></div>
+    <h2>비교할 점</h2>
+    <ul class="points">
+      <li>6선과 5선은 스텝마다 켜는 코일이 같아요. 가운데 탭이 코일마다 따로 나오느냐, 모터 안에서 하나로 묶였느냐가 달라요.</li>
+      <li>5선과 4선은 2상 여자에서 자기장 방향이 같아요. 5선은 코일 절반을 골라 켜고, 4선은 코일 전체의 전류 방향을 뒤집어요.</li>
+      <li>5선 모드의 2상 여자 표는 STM32 코드의 step_table 값 0x3, 0x6, 0xC, 0x9와 같은 순서예요.</li>
+      <li>주황·분홍이 한 코일, 노랑·파랑이 한 코일이에요. IN 번호와 선 색의 대응은 보드마다 다를 수 있어요.</li>
+      <li>6선과 4선의 선 이름은 설명용이에요. 실제 선 색은 제품마다 달라서 데이터시트나 멀티미터로 확인해야 해요.</li>
+      <li>그림은 전기적 연결을 보여 주는 회로도예요. 코일의 좌우와 화살표 방향은 실제 극 배치와 일치하지 않아요.</li>
+    </ul>
+  </section>
+</main>
+<script>
+const $=i=>document.getElementById(i);
+const arcs=(n,dx)=>Array(n).fill('a 11 11 0 0 '+(dx>0?1:0)+' '+dx+' 0').join(' ');
+const ph=(p,Y,t)=>`<text class="b" x="395" y="${Y-44}" text-anchor="middle">${t}</text>
+<line x1="200" y1="${Y}" x2="200" y2="${Y+48}" stroke="var(--wire)" stroke-width="2"/><line x1="460" y1="${Y}" x2="460" y2="${Y+48}" stroke="var(--wire)" stroke-width="2"/>
+<path d="M200 ${Y} ${arcs(12,21.67)}" fill="none" stroke="var(--wire)" stroke-width="3"/>
+<path id="${p}fL" class="cf" d="M330 ${Y} ${arcs(6,-21.67)} V${Y+48}"/><path id="${p}fR" class="cf" d="M330 ${Y} ${arcs(6,21.67)} V${Y+48}"/>
+<path id="${p}fW" class="cf" d="M200 ${Y+48} V${Y} ${arcs(12,21.67)} V${Y+48}"/>
+<text id="${p}eL" x="200" y="${Y-22}" text-anchor="middle"></text><text id="${p}eR" x="460" y="${Y-22}" text-anchor="middle"></text>
+<g class="tp"><path d="M330 ${Y-11}V${Y-52}H120" fill="none" stroke="var(--supply)" stroke-width="2"/><text id="${p}eC" x="324" y="${Y-30}" text-anchor="end"></text></g>
+<path id="${p}fC" class="cf" d="M120 172V${Y-52}H330V${Y}"/>
+<g id="${p}BL"><rect x="150" y="${Y+48}" width="100" height="46" rx="4"/><text id="${p}L1" class="b" x="200" y="${Y+64}" text-anchor="middle" dominant-baseline="central"></text><text id="${p}L2" x="200" y="${Y+81}" text-anchor="middle" dominant-baseline="central"></text></g>
+<g id="${p}BR"><rect x="410" y="${Y+48}" width="100" height="46" rx="4"/><text id="${p}R1" class="b" x="460" y="${Y+64}" text-anchor="middle" dominant-baseline="central"></text><text id="${p}R2" x="460" y="${Y+81}" text-anchor="middle" dominant-baseline="central"></text></g>`;
+$('sv').innerHTML=ph('a',110,'A 코일')+ph('b',320,'B 코일')+
+`<g class="tp"><path d="M120 58V268" fill="none" stroke="var(--supply)" stroke-width="2"/><line x1="112" y1="172" x2="120" y2="172" stroke="var(--supply)" stroke-width="2"/><g class="b-sup"><rect x="14" y="148" width="98" height="48" rx="4"/><text id="sup1" class="b" x="63" y="164" text-anchor="middle" dominant-baseline="central"></text><text id="sup2" x="63" y="182" text-anchor="middle" dominant-baseline="central"></text></g></g>
+<circle cx="595" cy="215" r="62" fill="none" stroke="var(--wire)"/>
+<text x="595" y="142" text-anchor="middle">A</text><text x="595" y="292" text-anchor="middle">A′</text><text x="668" y="219" text-anchor="middle">B</text><text x="522" y="219" text-anchor="middle">B′</text>
+<g id="rot"><line x1="595" y1="240" x2="595" y2="178" stroke="var(--rotor)" stroke-width="6" stroke-linecap="round"/><path d="M595 160L583 182H607Z" fill="var(--rotor)"/><circle cx="595" cy="215" r="7" fill="var(--rotor)"/></g>
+<text x="595" y="316" text-anchor="middle">합성 자기장 방향</text>`;
+const CFG={
+ m6:{uni:1,e:{a:['A','A′'],b:['B','B′']},c:{a:'A-COM',b:'B-COM'},d:{a:['Q1','Q3'],b:['Q2','Q4']},s:'+12V',s2:'외부에서 결선',note:'코일마다 가운데 탭이 따로 나와요. KH42처럼 저항이 낮은 모터는 전류 제한도 필요해요.'},
+ m5:{uni:1,e:{a:['주황','분홍'],b:['노랑','파랑']},c:{a:'빨강',b:'빨강'},d:{a:['IN1','IN3'],b:['IN2','IN4']},s:'+5V',s2:'모터 내부 결선',note:'두 가운데 탭이 모터 안에서 빨강 선 하나로 묶여 있어요.'},
+ m4:{uni:0,e:{a:['A1','A2'],b:['B1','B2']},d:{a:['1A','1B'],b:['2A','2B']},s:'VMOT',note:'가운데 탭이 없어요. H-브리지가 코일 양끝의 +V와 GND를 뒤집어 전류 방향을 바꿔요.'}
+};
+const SEQ={full:{A:[1,-1,-1,1],B:[1,1,-1,-1],a0:45},wave:{A:[1,0,-1,0],B:[0,1,0,-1],a0:0}};
+let m='m5',dr='full',s=0,ang=45,tm=null;
+const box=(id,on)=>$(id).setAttribute('class',on?'b-on':'b-off');
+const fl=(id,on,r)=>{const e=$(id);e.classList.toggle('go',!!on);e.classList.toggle('rev',!!r)};
+function cur(c,p,v){if(!v)return '없음';const e=c.e[p];if(c.uni)return c.c[p]+' → '+(v>0?e[0]:e[1]);return v>0?e[1]+' → '+e[0]:e[0]+' → '+e[1]}
+function dirn(a,b){const x=b>0?'오른쪽':b<0?'왼쪽':'',y=a>0?'위':a<0?'아래':'';return y&&x?y+' '+x:(y||x)}
+function phase(c,p,v){
+  const e=c.e[p],d=c.d[p];
+  fl(p+'fL',c.uni&&v>0);fl(p+'fR',c.uni&&v<0);fl(p+'fC',c.uni&&v!==0);fl(p+'fW',!c.uni&&v!==0,v>0);
+  $(p+'eL').textContent=e[0];$(p+'eR').textContent=e[1];$(p+'eC').textContent=c.uni?c.c[p]:'';
+  $(p+'L1').textContent=e[0]+' → '+d[0];$(p+'R1').textContent=e[1]+' → '+d[1];
+  if(c.uni){$(p+'L2').textContent=v>0?'ON: GND 연결':'OFF: 끊김';$(p+'R2').textContent=v<0?'ON: GND 연결':'OFF: 끊김';box(p+'BL',v>0);box(p+'BR',v<0)}
+  else{const f=x=>v===0?'꺼짐':(x?'+V':'GND');$(p+'L2').textContent=f(v<0);$(p+'R2').textContent=f(v>0);box(p+'BL',v!==0);box(p+'BR',v!==0)}
+}
+function wires(c,A,B){
+  const rows=[];
+  [['a','A',A],['b','B',B]].forEach(([p,n,v])=>{
+    const e=c.e[p],d=c.d[p];
+    if(c.uni){
+      rows.push([e[0],n+' 코일 왼쪽 끝',d[0],v>0?'ON, 전류가 나감':'OFF',v>0]);
+      if(m==='m6')rows.push([c.c[p],n+' 코일 가운데 탭','+12V',v?'전류 공급':'대기',!!v]);
+      rows.push([e[1],n+' 코일 오른쪽 끝',d[1],v<0?'ON, 전류가 나감':'OFF',v<0]);
+    }else{
+      const st=x=>v===0?'꺼짐':(x?'+V, 전류가 들어감':'GND, 전류가 나감');
+      rows.push([e[0],n+' 코일 왼쪽 끝',d[0],st(v<0),!!v]);
+      rows.push([e[1],n+' 코일 오른쪽 끝',d[1],st(v>0),!!v]);
+    }
+  });
+  if(m==='m5')rows.push(['빨강','A, B 코일 가운데 탭','+5V',(A||B)?'전류 공급':'대기',!!(A||B)]);
+  $('tW').innerHTML='<tr><th>선</th><th>코일 위치</th><th>연결 대상</th><th>현재 상태</th></tr>'+rows.map(r=>'<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="'+(r[4]?'on':'')+'">'+r[3]+'</td></tr>').join('');
+}
+function steps(c){
+  const S=SEQ[dr],h=c.uni?'<th>켜는 스위치</th>':'<th>1A/1B, 2A/2B</th>';
+  let t='<tr><th>스텝</th>'+h+'<th>A 코일 전류</th><th>B 코일 전류</th><th>자기장</th></tr>';
+  for(let i=0;i<4;i++){
+    const a=S.A[i],b=S.B[i];let col;
+    if(c.uni){const on=[];if(a)on.push(c.d.a[a>0?0:1]);if(b)on.push(c.d.b[b>0?0:1]);col=on.join(', ')}
+    else{const f=v=>v===0?'꺼짐':v>0?'L/H':'H/L';col=f(a)+', '+f(b)}
+    t+='<tr class="'+(i===s?'cur':'')+'"><td>'+(i+1)+'</td><td>'+col+'</td><td>'+cur(c,'a',a)+'</td><td>'+cur(c,'b',b)+'</td><td>'+dirn(a,b)+'</td></tr>';
+  }
+  $('tS').innerHTML=t;
+}
+function draw(){
+  const c=CFG[m],S=SEQ[dr],A=S.A[s],B=S.B[s];
+  document.querySelectorAll('#mS .btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.m===m)));
+  document.querySelectorAll('#dS .btn').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.d===dr)));
+  document.querySelectorAll('.tp').forEach(e=>{e.style.display=c.uni?'':'none'});
+  $('sup1').textContent=c.s;$('sup2').textContent=c.s2||'';
+  phase(c,'a',A);phase(c,'b',B);
+  $('rot').setAttribute('transform','rotate('+ang+' 595 215)');
+  let t='스텝 '+(s+1)+'/4. A 코일: '+cur(c,'a',A)+'. B 코일: '+cur(c,'b',B)+'. '+c.note;
+  if(!c.uni&&dr==='wave')t+=' DRV8825의 풀스텝은 2상 여자라서, 1상 여자는 원리 비교용이에요.';
+  $('info').textContent=t;
+  wires(c,A,B);steps(c);
+}
+function go(d){s=(s+d+4)%4;ang+=90*d;draw()}
+function reset(){s=0;ang=SEQ[dr].a0;draw()}
+$('next').onclick=()=>go(1);$('prev').onclick=()=>go(-1);
+$('auto').onclick=function(){if(tm){clearInterval(tm);tm=null;this.textContent='자동 진행';this.setAttribute('aria-pressed','false')}else{tm=setInterval(()=>go(1),1200);this.textContent='멈춤';this.setAttribute('aria-pressed','true')}};
+document.querySelectorAll('#mS .btn').forEach(b=>b.onclick=()=>{m=b.dataset.m;draw()});
+document.querySelectorAll('#dS .btn').forEach(b=>b.onclick=()=>{dr=b.dataset.d;reset()});
+reset();
+</script>
+</body>
+</html>

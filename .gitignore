@@ -1,0 +1,73 @@
+# ============================================================
+#  Line Tracer (.gitignore)
+# ============================================================
+
+# ---------- 동영상 (용량이 커서 업로드하지 않음) ----------
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# ---------- 원본 사진 (축소본만 업로드) ----------
+/실험_사진/28_BYJ_48_Test/원본/
+
+# ---------- 실험 영상 폴더 ----------
+/실험_사진/28_BYJ_48_Test/영상/
+
+# ---------- 압축 파일 (원본 폴더와 중복) ----------
+*.zip
+*.7z
+*.rar
+
+# ---------- 빌드 결과물 (IDE가 다시 생성) ----------
+**/Debug/
+**/Release/
+
+# 컴파일 산출물
+*.o
+*.d
+*.su
+*.cyclo
+*.a
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.srec
+
+# 빌드용 makefile (IDE가 자동 생성)
+makefile
+objects.mk
+objects.list
+sources.mk
+subdir.mk
+
+# ---------- 디버그 / 로그 ----------
+*.log
+*.tmp
+st-link_gdbserver_log*.txt
+
+# ---------- LTspice 시뮬레이션 결과 (.asc 회로 파일은 커밋) ----------
+*.raw
+
+# ---------- Eclipse / STM32CubeIDE 개인 설정 ----------
+# .project, .cproject, *.launch, *.ioc 는 프로젝트 복원에 필요하므로 커밋합니다.
+.metadata/
+RemoteSystemsTempFiles/
+**/.settings/language.settings.xml
+*.bak
+
+# ---------- STM32CubeMX 부산물 ----------
+.mxproject
+
+# ---------- 에디터 ----------
+.vscode/
+.idea/
+*.swp
+*~
+
+# ---------- OS ----------
+Thumbs.db
+desktop.ini
+.DS_Store
