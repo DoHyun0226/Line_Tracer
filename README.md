@@ -1,7 +1,7 @@
 # Line Tracer
 
 NUCLEO-G474RE 보드와 스텝모터로 라인트레이서를 만드는 프로젝트이다.
-지금은 부품을 하나씩 시험하는 단계이며, 첫 실험으로 28BYJ-48 스텝모터를 구동해 보았다.
+지금은 부품을 하나씩 시험하는 단계이며, 28BYJ-48 스텝모터 구동과 TCRT5000 센서 2개 읽기까지 해 보았다.
 
 - 보드: NUCLEO-G474RE (STM32G474RE, SYSCLK 170MHz)
 - 개발 환경: STM32CubeIDE (HAL)
@@ -48,9 +48,34 @@ main의 while(1)
 - 모터 드라이버: ULN2003
 - 실험 영상: [YouTube](https://www.youtube.com/shorts/aOwYWziigPU)
 
+### ADC_TCRT5000
+
+TCRT5000 센서 2개 값을 ADC1 + DMA로 계속 읽고, 0.1초마다 USART1 → 블루투스(BT04-A)로 PC에 보낸다.
+세부 내용은 [ADC_TCRT5000 README](Project_code/ADC_TCRT5000/README.md), 회로도와 측정값은 [TCRT5000_Test README](실험_사진/TCRT5000_Test/README.md)를 참고.
+
+```
+초기화: 캘리브레이션 → HAL_ADC_Start_DMA(buf, 2)
+
+ADC1 (Continuous) + DMA (Circular)
+ └─ IN1 → buf[0], IN2 → buf[1] 을 CPU 개입 없이 계속 갱신
+
+main의 while(1)
+ └─ snprintf로 "센서1 센서2\r\n" 문자열을 만들어 HAL_UART_Transmit, HAL_Delay(100)
+```
+
+| 신호 | 핀 | 설정 |
+|---|---|---|
+| 센서 1 | PA0 | ADC1_IN1, Single-ended, 640.5 cycles |
+| 센서 2 | PA1 | ADC1_IN2, Single-ended, 640.5 cycles |
+| UART TX | PC4 | USART1_TX, 9600bps 8N1 |
+| UART RX | PC5 | USART1_RX |
+
+- 측정값: 흰 종이 약 200, 두꺼운 검정 약 2000, 공중 약 3900 (12bit)
+- 회로: IR LED는 5V + 200Ω, 포토트랜지스터는 3.3V + 10kΩ 풀업
+
 ## 빌드 방법
 
-1. STM32CubeIDE에서 `File > Import > Existing Projects into Workspace`로 `Project_code/step_motor`를 불러온다.
+1. STM32CubeIDE에서 `File > Import > Existing Projects into Workspace`로 `Project_code` 안의 프로젝트 폴더(예: `step_motor`, `ADC_TCRT5000`)를 불러온다.
 2. Build 후 NUCLEO-G474RE에 Debug 또는 Run으로 올린다.
 
 `Debug/` 폴더, `.mxproject` 등 IDE가 다시 만드는 파일은 저장소에 포함하지 않는다.
@@ -58,8 +83,9 @@ main의 while(1)
 ## 진행 상황
 
 - [x] 28BYJ-48 + ULN2003 구동 코드 작성 및 실험 (2026-11-02)
+- [x] TCRT5000 2개를 ADC1 + DMA로 읽고 블루투스로 출력 (2026-11-10)
 - [ ] DRV8825로 KH42JM2-901 구동
-- [ ] TCRT5000 센서 어레이 구성과 다채널 ADC 읽기
+- [ ] TCRT5000 센서 어레이(5~8개) 구성과 흰색/검은색 기준값 정하기
 - [ ] 전원부(3S LiPo, 5V 강압) 구성
 - [ ] 차체 제작
 - [ ] 라인 추종 제어 구현
