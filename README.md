@@ -72,6 +72,7 @@ main의 while(1)
 
 - 측정값: 흰 종이 약 200, 두꺼운 검정 약 2000, 공중 약 3900 (12bit)
 - 회로: IR LED는 5V + 200Ω, 포토트랜지스터는 3.3V + 10kΩ 풀업
+- 실험 영상: [YouTube](https://www.youtube.com/watch?v=wzNOWmWIKts)
 
 ## 빌드 방법
 

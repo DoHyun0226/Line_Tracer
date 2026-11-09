@@ -5,6 +5,7 @@ USART1은 블루투스 모듈 BT04-A에 연결되어 있어서, PC에서는 블�
 직접 작성한 코드는 모두 `Core/Src/main.c`에 있고, 설정은 `ADC_TCRT5000.ioc`로 만들었다.
 
 회로도, 측정값, 실험 사진은 [TCRT5000_Test](../../실험_사진/TCRT5000_Test)에 정리되어 있다.
+실험 영상: [YouTube](https://www.youtube.com/watch?v=wzNOWmWIKts)
 
 ## 하드웨어
 

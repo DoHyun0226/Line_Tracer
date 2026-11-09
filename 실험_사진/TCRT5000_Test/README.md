@@ -5,6 +5,7 @@ NUCLEO-G474RE의 ADC1 + DMA로 TCRT5000 센서 2개 값을 읽고, USART1과 블
 - 실험일: 2026-11-10
 - 코드: [ADC_TCRT5000](../../Project_code/ADC_TCRT5000)
 - 결과: 흰색과 검은색에서 ADC 값 차이가 크게 나는 것을 확인
+- 영상: [YouTube](https://www.youtube.com/watch?v=wzNOWmWIKts)
 
 ![전체 구성](1_setup_overview.jpg)
 
