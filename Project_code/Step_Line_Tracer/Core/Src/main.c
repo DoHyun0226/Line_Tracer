@@ -99,8 +99,8 @@ int main(void)
    * The STM32G4 (Cortex-M4F) FPU supports single precision (float) only.
    * double operations are not handled by the hardware FPU and are emulated
    * in software, which is much slower. Use float literals too (e.g. 1.0f). */
-  float k_p, k_i, k_d; 					// PID parameter
-  float gain_p, gain_i, gain_d; 		// PID gain
+  float k_p, k_i, k_d; 					// PID coefficients (Kp, Ki, Kd), tuning constants
+  float gain_p, gain_i, gain_d; 		// P, I, D term outputs, recalculated every tick (e.g. gain_p = k_p * err_curr)
   float err_curr; 						// current error (line position, -11 ~ +11, 0 = center)
   float	err_prev;						// previous error (last tick, used for D term)
   /* USER CODE END 1 */
