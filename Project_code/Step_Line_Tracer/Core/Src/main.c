@@ -86,16 +86,23 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  uint16_t buf_tcrt_1[NUMTCRT_1] = {0,}; // adc1 data
-  uint16_t buf_tcrt_2[NUMTCRT_2] = {0,}; // adc2 data
+  /* =====   TCRT5000 (ADC + DMA)   ===== */
+  /* DMA keeps overwriting these buffers in the background, so they are
+   * volatile: the compiler must re-read them every time instead of caching.
+   * Index order follows the sensor diagram above (b1[k] and b2[k] are a
+   * left/right mirror pair around the center). */
+  volatile uint16_t buf_tcrt_1[NUMTCRT_1] = {0,}; // adc1 data (S1~S6), updated by DMA
+  volatile uint16_t buf_tcrt_2[NUMTCRT_2] = {0,}; // adc2 data (S7~S12), updated by DMA
 
+  /* =====   PID   ===== */
   /* Use float, not double:
    * The STM32G4 (Cortex-M4F) FPU supports single precision (float) only.
    * double operations are not handled by the hardware FPU and are emulated
    * in software, which is much slower. Use float literals too (e.g. 1.0f). */
-  float k_p, k_i, k_d; // PID parameter
-
-  float gain_p, gain_i, gain_d;
+  float k_p, k_i, k_d; 					// PID parameter
+  float gain_p, gain_i, gain_d; 		// PID gain
+  float err_curr; 						// current error (line position, -11 ~ +11, 0 = center)
+  float	err_prev;						// previous error (last tick, used for D term)
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
