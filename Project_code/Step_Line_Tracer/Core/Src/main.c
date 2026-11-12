@@ -37,7 +37,7 @@
 /* USER CODE BEGIN PD */
 #define NUMTCRT_1 6 // number of tcrt 5000 that is connected to the ADC1
 #define NUMTCRT_2 6 // number of tcrt 5000 that is connected to the ADC2
-                              ▲ 진행 방향 (로봇 앞쪽)
+
 //                                     ^ FRONT ^
 //
 // <-------------- ADC1 --------------->   |   <-------------- ADC2 --------------->
@@ -53,7 +53,7 @@
 //   -11   -9    -7    -5    -3    -1      |     +1    +3    +5    +7    +9    +11    <- Weight
 //                                         |
 // <<< Rank 1 first                     CENTER                   Rank 1 first >>>
-//                                    (error = 0)                     (error = 0)
+//                                    (error = 0)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -123,8 +123,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED); 				// ADC1 Calibration
   HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);       			// ADC2 Calibration
-  HAL_ADC_Start_DMA(&hdma_adc1, (uint32_t *)buf_tcrt_1, NUMTCRT_1)		// ADC1 and ADC1_dma start
-  HAL_ADC_Start_DMA(&hdma_adc2, (uint32_t *)buf_tcrt_2, NUMTCRT_2)		// ADC2 and ADC2_dma start
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)buf_tcrt_1, NUMTCRT_1);		// ADC1 and ADC1_dma start
+  HAL_ADC_Start_DMA(&hadc2, (uint32_t *)buf_tcrt_2, NUMTCRT_2);		// ADC2 and ADC2_dma start
   /* USER CODE END 2 */
 
   /* Infinite loop */
