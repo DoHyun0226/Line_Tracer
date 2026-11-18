@@ -1,23 +1,36 @@
 # Line Tracer
 
 NUCLEO-G474RE 보드와 스텝모터로 라인트레이서를 만드는 프로젝트이다.
-지금은 부품을 하나씩 시험하는 단계이며, 28BYJ-48 스텝모터 구동과 TCRT5000 센서 2개 읽기까지 해 보았다.
+부품 시험(28BYJ-48, TCRT5000 2개, KH42JM2-901 1개)을 마치고, 본 프로젝트 [Step_Line_Tracer](Project_code/Step_Line_Tracer)의 코드를 작성하는 중이다.
 
 - 보드: NUCLEO-G474RE (STM32G474RE, SYSCLK 170MHz)
 - 개발 환경: STM32CubeIDE (HAL)
 - 구동 모터: KH42JM2-901 2개
-- 스테퍼 드라이버: DRV8825
-- 라인 센서: TCRT5000 적외선 광센서 어레이
+- 스테퍼 드라이버: DRV8825 2개 (1/8 마이크로스텝)
+- 라인 센서: TCRT5000 적외선 광센서 8개
 
 ## 폴더 구성
 
 | 폴더 | 내용 |
 |---|---|
 | [Project_code](Project_code) | STM32CubeIDE 프로젝트 |
+| [CAD](CAD) | 차체, 브라켓 STL과 렌더 이미지 |
 | [실험_사진](실험_사진) | 실험 사진 축소본 (원본 사진과 동영상 `*.mp4`는 용량 때문에 저장소에 올리지 않음) |
 | [자료](자료) | 데이터시트, 구매 체크리스트, 참고 라이브러리, 학습용 시뮬레이션 HTML |
 
 ## 프로젝트 목록
+
+### Step_Line_Tracer (본 프로젝트)
+
+TCRT5000 8개(ADC1, ADC2 + DMA)로 라인 위치(mm)를 구하고, PID로 좌우 KH42JM2-901 속도를 정한다.
+모듈은 `tcrt5000` (센서) → `pid` (제어, 가속 제한) → `stepper` (모터 구동)로 나뉘어 있다.
+빌드까지 확인했고, 하드웨어 주행은 아직이다. 세부 내용은 [Step_Line_Tracer README](Project_code/Step_Line_Tracer/README.md),
+배선은 [Step_Line_Tracer_배선도.svg](자료/Step_Line_Tracer_배선도.svg)를 참고.
+
+### step_motor_KH42JM2_901
+
+DRV8825로 KH42JM2-901 하나를 TIM1 PWM으로 앞뒤 가속/감속시키는 시험이다. 2026-11-18에 실제로 회전을 확인했다.
+세부 내용은 [step_motor_KH42JM2_901 README](Project_code/step_motor_KH42JM2_901/README.md)를 참고.
 
 ### step_motor
 
@@ -76,7 +89,7 @@ main의 while(1)
 
 ## 빌드 방법
 
-1. STM32CubeIDE에서 `File > Import > Existing Projects into Workspace`로 `Project_code` 안의 프로젝트 폴더(예: `step_motor`, `ADC_TCRT5000`)를 불러온다.
+1. STM32CubeIDE에서 `File > Import > Existing Projects into Workspace`로 `Project_code` 안의 프로젝트 폴더(예: `Step_Line_Tracer`, `step_motor`)를 불러온다.
 2. Build 후 NUCLEO-G474RE에 Debug 또는 Run으로 올린다.
 
 `Debug/` 폴더, `.mxproject` 등 IDE가 다시 만드는 파일은 저장소에 포함하지 않는다.
@@ -85,11 +98,13 @@ main의 while(1)
 
 - [x] 28BYJ-48 + ULN2003 구동 코드 작성 및 실험 (2026-11-02)
 - [x] TCRT5000 2개를 ADC1 + DMA로 읽고 블루투스로 출력 (2026-11-10)
-- [ ] DRV8825로 KH42JM2-901 구동
-- [ ] TCRT5000 센서 어레이(5~8개) 구성과 흰색/검은색 기준값 정하기
+- [x] DRV8825로 KH42JM2-901 1개 구동 (2026-11-18)
+- [x] Step_Line_Tracer: CubeMX 핀 배치, 모터 2개 / 센서 8개 / PID 코드 작성, 빌드 확인 (2026-11-19)
+- [ ] TCRT5000 8개 흰색/검은색 기준값 측정
+- [ ] 버튼 시작/정지, 라인 놓침 정지, 교차로와 정지선 처리
+- [ ] 하드웨어 주행 시험과 PID 튜닝
 - [ ] 전원부(3S LiPo, 5V 강압) 구성
-- [ ] 차체 제작
-- [ ] 라인 추종 제어 구현
+- [ ] 차체 제작 (CAD 설계는 [CAD](CAD)에 있음)
 
 ## 참고 자료
 
