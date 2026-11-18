@@ -20,11 +20,15 @@
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stepper.h"
+#include "tcrt5000.h"
+#include "pid.h"
 
 /* USER CODE END Includes */
 
@@ -35,25 +39,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define NUMTCRT_1 6 // number of tcrt 5000 that is connected to the ADC1
-#define NUMTCRT_2 6 // number of tcrt 5000 that is connected to the ADC2
+/* ===== 스텝모터 테스트 (DRV8825 + KH42JM2-901) =====
+ * 1 = while(1)에서 라인트레이서 대신 아래 모터 테스트를 실행.
+ * 전진 가속 -> 유지 -> 감속 -> 쉼 -> 후진도 똑같이, 무한 반복. */
+#define MOTOR_TEST          1
+#define TEST_HZ             (1.0f * STEPPER_STEPS_PER_REV)   // 초당 1회전
+#define TEST_ACCEL_HZ       (10.0f * STEPPER_MICROSTEP)      // 10 ms마다 더하는 Hz (1/8 모드: 80 Hz = 8000 Hz/s = 초당 5바퀴씩 가속)
+#define TEST_HOLD_MS        2000                      // 최고 속도 유지 시간
+#define TEST_PAUSE_MS       1000                      // 방향 바꾸기 전 쉬는 시간
 
-//                                     ^ FRONT ^
-//
-// <-------------- ADC1 --------------->   |   <-------------- ADC2 --------------->
-//                                         |
-// +-----+-----+-----+-----+-----+-----+   |   +-----+-----+-----+-----+-----+-----+
-// | S1  | S2  | S3  | S4  | S5  | S6  |   |   | S7  | S8  | S9  | S10 | S11 | S12 |
-// +-----+-----+-----+-----+-----+-----+   |   +-----+-----+-----+-----+-----+-----+
-//                                         |
-//   PA0   PA1   PB14  PB12  PB1   PB0     |     PA4   PB2   PC5   PC4   PA7   PA6    <- Pin
-//   IN1   IN2   IN5   IN11  IN12  IN15    |     IN17  IN12  IN11  IN5   IN4   IN3    <- Channel
-//   R1    R2    R3    R4    R5    R6      |     R6    R5    R4    R3    R2    R1     <- Rank
-//  b1[0] b1[1] b1[2] b1[3] b1[4] b1[5]    |    b2[5] b2[4] b2[3] b2[2] b2[1] b2[0]   <- DMA buf
-//   -11   -9    -7    -5    -3    -1      |     +1    +3    +5    +7    +9    +11    <- Weight
-//                                         |
-// <<< Rank 1 first                     CENTER                   Rank 1 first >>>
-//                                    (error = 0)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -70,6 +64,7 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+static void Motor_Test_Run(float target_hz);
 
 /* USER CODE END PFP */
 
@@ -86,23 +81,13 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-  /* =====   TCRT5000 (ADC + DMA)   ===== */
-  /* DMA keeps overwriting these buffers in the background, so they are
-   * volatile: the compiler must re-read them every time instead of caching.
-   * Index order follows the sensor diagram above (b1[k] and b2[k] are a
-   * left/right mirror pair around the center). */
-  volatile uint16_t buf_tcrt_1[NUMTCRT_1] = {0,}; // adc1 data (S1~S6), updated by DMA
-  volatile uint16_t buf_tcrt_2[NUMTCRT_2] = {0,}; // adc2 data (S7~S12), updated by DMA
+
 
   /* =====   PID   ===== */
-  /* Use float, not double:
-   * The STM32G4 (Cortex-M4F) FPU supports single precision (float) only.
-   * double operations are not handled by the hardware FPU and are emulated
-   * in software, which is much slower. Use float literals too (e.g. 1.0f). */
-  float k_p, k_i, k_d; 					// PID coefficients (Kp, Ki, Kd), tuning constants
-  float gain_p, gain_i, gain_d; 		// P, I, D term outputs, recalculated every tick (e.g. gain_p = k_p * err_curr)
-  float err_curr; 						// current error (line position, -11 ~ +11, 0 = center)
-  float	err_prev;						// previous error (last tick, used for D term)
+  /* PID 계수, 출력 제한, 내부 상태(gain_p/i/d, err_prev)는 pid.h / pid.c에 있음 */
+  float err_curr; 						// 현재 오차 (라인 위치, -7 ~ +7, 0 = 가운데) -> PID 입력
+  uint32_t dt; 							// 주기 간격 (ms)
+  uint32_t last_tick;					// 지난 주기의 HAL_GetTick() 값 (HAL_GetTick()과 같은 uint32_t)
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -127,11 +112,14 @@ int main(void)
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_USART1_UART_Init();
+  MX_TIM3_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED); 				// ADC1 Calibration
-  HAL_ADCEx_Calibration_Start(&hadc2, ADC_SINGLE_ENDED);       			// ADC2 Calibration
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *)buf_tcrt_1, NUMTCRT_1);		// ADC1 and ADC1_dma start
-  HAL_ADC_Start_DMA(&hadc2, (uint32_t *)buf_tcrt_2, NUMTCRT_2);		// ADC2 and ADC2_dma start
+  tcrt5000_init();
+  Stepper_Init();                                                  // TIM1, TIM3 PWM 시작 (CCR=0이라 아직 펄스 없음)
+#if MOTOR_TEST
+  Stepper_Enable(1);                                               // EN LOW -> 코일에 전류 (테스트 모드에서만 바로 켬)
+#endif
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -141,6 +129,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+#if MOTOR_TEST
+    Motor_Test_Run(+TEST_HZ);      // 전진
+    HAL_Delay(TEST_PAUSE_MS);
+    Motor_Test_Run(-TEST_HZ);      // 후진
+    HAL_Delay(TEST_PAUSE_MS);
+#endif
   }
   /* USER CODE END 3 */
 }
@@ -191,6 +185,37 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+/**
+  * @brief  두 모터를 0 -> target_hz로 가속, 유지, 다시 0으로 감속.
+  *         스텝모터는 너무 갑자기 출발하거나 멈추면 스텝을 놓치거나(탈조)
+  *         웅웅거리기만 하므로, 10 ms마다 조금씩 속도를 바꾼다.
+  * @param  target_hz  최고 속도 (+ 전진 / - 후진)
+  */
+static void Motor_Test_Run(float target_hz)
+{
+  float step = (target_hz > 0.0f) ? TEST_ACCEL_HZ : -TEST_ACCEL_HZ;   // 한 번에 바꿀 양 (방향 포함)
+  float hz = 0.0f;
+
+  while (hz != target_hz)                         // 가속 (넘으면 아래에서 target_hz로 딱 맞추므로 != 비교가 끝남)
+  {
+    hz += step;
+    if ((step > 0.0f && hz > target_hz) || (step < 0.0f && hz < target_hz)) hz = target_hz;   // 목표 넘지 않게
+    Stepper_SetSpeed(STEPPER_LEFT,  hz);
+    Stepper_SetSpeed(STEPPER_RIGHT, hz);
+    HAL_Delay(10);
+  }
+
+  HAL_Delay(TEST_HOLD_MS);                        // 일정 속도 유지
+
+  while (hz != 0.0f)                              // 감속
+  {
+    hz -= step;
+    if ((step > 0.0f && hz < 0.0f) || (step < 0.0f && hz > 0.0f)) hz = 0.0f;   // 0 넘지 않게
+    Stepper_SetSpeed(STEPPER_LEFT,  hz);
+    Stepper_SetSpeed(STEPPER_RIGHT, hz);
+    HAL_Delay(10);
+  }
+}
 
 /* USER CODE END 4 */
 
