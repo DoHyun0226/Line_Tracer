@@ -1,0 +1,239 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1180" width="1500" height="1180">
+  <style>
+    text { font-family: "Malgun Gothic", "Noto Sans KR", sans-serif; fill: #222; }
+    .title { font-size: 26px; font-weight: bold; }
+    .sub   { font-size: 14px; fill: #555; }
+    .h     { font-size: 17px; font-weight: bold; }
+    .t     { font-size: 14px; }
+    .s     { font-size: 12px; fill: #444; }
+    .pin   { font-size: 14px; font-weight: bold; }
+    .mono  { font-family: Consolas, "D2Coding", monospace; font-size: 13px; }
+    .wire  { fill: none; stroke-width: 2.2; }
+  </style>
+
+  <!-- 제목 -->
+  <text x="40" y="42" class="title">Step_Line_Tracer 배선도 (NUCLEO-G474RE)</text>
+  <text x="40" y="66" class="sub">2026-11-19 기준 CubeMX(.ioc) 설정 · 센서 8개 · DRV8825 1/8 마이크로스텝 · 핀 옆 괄호는 Arduino 헤더 번호</text>
+
+  <!-- ================= MCU ================= -->
+  <rect x="560" y="95" width="380" height="800" rx="10" fill="#f3f4f6" stroke="#555" stroke-width="2"/>
+  <text x="750" y="122" text-anchor="middle" class="h">STM32G474RE (170 MHz)</text>
+
+  <!-- 내부 블록: ADC1 -->
+  <rect x="580" y="135" width="170" height="145" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
+  <text x="665" y="155" text-anchor="middle" class="h" fill="#2c7a39">ADC1 + DMA</text>
+  <text x="590" y="174" class="s">IN5  Rank1 → buf1[0]</text>
+  <text x="590" y="214" class="s">IN11 Rank2 → buf1[1]</text>
+  <text x="590" y="254" class="s">IN12 Rank3 → buf1[2]</text>
+  <text x="590" y="273" class="s">IN15 Rank4 → buf1[3]</text>
+
+  <!-- 내부 블록: ADC2 -->
+  <rect x="580" y="320" width="170" height="145" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
+  <text x="665" y="340" text-anchor="middle" class="h" fill="#2c7a39">ADC2 + DMA</text>
+  <text x="590" y="359" class="s">IN17 Rank4 → buf2[3]</text>
+  <text x="590" y="399" class="s">IN12 Rank3 → buf2[2]</text>
+  <text x="590" y="439" class="s">IN11 Rank2 → buf2[1]</text>
+  <text x="590" y="458" class="s">IN5  Rank1 → buf2[0]</text>
+
+  <!-- 내부 블록: USART1 -->
+  <rect x="580" y="535" width="170" height="85" rx="6" fill="#fdebd8" stroke="#d07a1e"/>
+  <text x="665" y="556" text-anchor="middle" class="h" fill="#a65a0c">USART1</text>
+  <text x="590" y="578" class="s">TX  115200 bps</text>
+  <text x="590" y="612" class="s">RX</text>
+
+  <!-- 내부 블록: TIM1 -->
+  <rect x="770" y="135" width="150" height="70" rx="6" fill="#e1ecfb" stroke="#2f6fd0"/>
+  <text x="845" y="156" text-anchor="middle" class="h" fill="#1f56a8">TIM1 CH1</text>
+  <text x="780" y="176" class="s">PWM, PSC 169 → 1 MHz</text>
+  <text x="780" y="194" class="s">Hz = 1 MHz / (ARR+1)</text>
+
+  <!-- 내부 블록: GPIO 모터 -->
+  <rect x="770" y="215" width="150" height="110" rx="6" fill="#efe5fb" stroke="#7a45c8"/>
+  <text x="845" y="236" text-anchor="middle" class="h" fill="#5b2ea0">GPIO 출력</text>
+  <text x="780" y="256" class="s">LM_Dir  (초기 LOW)</text>
+  <text x="780" y="296" class="s">Motor_en (초기 HIGH</text>
+  <text x="780" y="312" class="s">  = 모터 꺼짐)</text>
+
+  <!-- 내부 블록: TIM3 -->
+  <rect x="770" y="425" width="150" height="70" rx="6" fill="#e1ecfb" stroke="#2f6fd0"/>
+  <text x="845" y="446" text-anchor="middle" class="h" fill="#1f56a8">TIM3 CH2</text>
+  <text x="780" y="466" class="s">PWM, PSC 169 → 1 MHz</text>
+  <text x="780" y="484" class="s">ARR, CCR preload ON</text>
+
+  <rect x="770" y="505" width="150" height="45" rx="6" fill="#efe5fb" stroke="#7a45c8"/>
+  <text x="780" y="532" class="s">RM_Dir  (초기 LOW)</text>
+
+  <!-- 보드 내장: 버튼, LED -->
+  <rect x="580" y="680" width="340" height="190" rx="6" fill="#ffffff" stroke="#888" stroke-dasharray="5 4"/>
+  <text x="750" y="702" text-anchor="middle" class="h">보드에 달린 것 (배선 없음)</text>
+  <rect x="600" y="720" width="130" height="50" rx="6" fill="#dde6f0" stroke="#4a6a8a"/>
+  <text x="665" y="742" text-anchor="middle" class="t">B1 버튼</text>
+  <text x="665" y="760" text-anchor="middle" class="s">PC13</text>
+  <line x1="730" y1="745" x2="770" y2="745" stroke="#4a6a8a" stroke-width="2"/>
+  <text x="776" y="740" class="s">EXTI13, Rising</text>
+  <text x="776" y="756" class="s">EXTI15_10 우선순위 0</text>
+  <text x="776" y="772" class="s">→ IDLE ⇄ RUN</text>
+  <rect x="600" y="790" width="130" height="50" rx="6" fill="#e6f5e6" stroke="#3a8a3a"/>
+  <text x="665" y="812" text-anchor="middle" class="t">LD2 LED</text>
+  <text x="665" y="830" text-anchor="middle" class="s">PA5 (D13)</text>
+  <line x1="730" y1="815" x2="770" y2="815" stroke="#3a8a3a" stroke-width="2"/>
+  <text x="776" y="812" class="s">GPIO 출력 (State_LED)</text>
+  <text x="776" y="828" class="s">→ 상태 표시</text>
+
+  <!-- ================= 센서 (왼쪽) ================= -->
+  <text x="40" y="118" class="h">TCRT5000 × 8</text>
+  <text x="40" y="136" class="s">흰색 ≈ 200, 검정 ≈ 2000 (11/10 실험값)</text>
+
+  <!-- ADC1 센서 -->
+  <g class="t">
+    <rect x="40" y="158" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="178" text-anchor="middle">S1  (−7)</text>
+    <rect x="40" y="198" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="218" text-anchor="middle">S2  (−5)</text>
+    <rect x="40" y="238" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="258" text-anchor="middle">S3  (−3)</text>
+    <rect x="40" y="278" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="298" text-anchor="middle">S4  (−1)</text>
+  </g>
+  <!-- ADC2 센서 -->
+  <g class="t">
+    <rect x="40" y="343" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="363" text-anchor="middle">S5  (+1)</text>
+    <rect x="40" y="383" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="403" text-anchor="middle">S6  (+3)</text>
+    <rect x="40" y="423" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="443" text-anchor="middle">S7  (+5)</text>
+    <rect x="40" y="463" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="483" text-anchor="middle">S8  (+7)</text>
+  </g>
+
+  <!-- 센서 배선 (센서 → 핀) -->
+  <g class="wire" stroke="#3a9a4a">
+    <polyline points="150,173 400,173 400,170 580,170"/>
+    <polyline points="150,213 580,210"/>
+    <polyline points="150,253 580,250"/>
+    <polyline points="150,293 400,293 400,269 580,269"/>
+    <polyline points="150,358 400,358 400,355 580,355"/>
+    <polyline points="150,398 580,395"/>
+    <polyline points="150,438 580,435"/>
+    <polyline points="150,478 400,478 400,454 580,454"/>
+  </g>
+  <!-- 핀 이름 (센서 쪽) -->
+  <g class="pin">
+    <text x="545" y="165" text-anchor="end">PB14</text>
+    <text x="545" y="205" text-anchor="end">PB12</text>
+    <text x="545" y="245" text-anchor="end">PB1</text>
+    <text x="545" y="286" text-anchor="end">PB0</text>
+    <text x="545" y="350" text-anchor="end">PA4</text>
+    <text x="545" y="390" text-anchor="end">PB2</text>
+    <text x="545" y="430" text-anchor="end">PC5</text>
+    <text x="545" y="471" text-anchor="end">PC4</text>
+  </g>
+
+  <!-- ================= 블루투스 (왼쪽 아래) ================= -->
+  <rect x="40" y="540" width="170" height="80" rx="6" fill="#fff" stroke="#d07a1e" stroke-width="1.5"/>
+  <text x="125" y="563" text-anchor="middle" class="h" fill="#a65a0c">BT04-A</text>
+  <text x="55" y="583" class="t">RXD</text>
+  <text x="55" y="613" class="t">TXD</text>
+  <text x="125" y="600" class="s">VCC 5V</text>
+  <g class="wire" stroke="#d07a1e">
+    <line x1="580" y1="574" x2="210" y2="578"/>
+    <line x1="210" y1="608" x2="580" y2="608"/>
+  </g>
+  <polygon points="218,578 230,572 230,584" fill="#d07a1e"/>
+  <polygon points="572,608 560,602 560,614" fill="#d07a1e"/>
+  <text x="545" y="568" text-anchor="end" class="pin">PA9 (D8)  TX →</text>
+  <text x="545" y="630" text-anchor="end" class="pin">PA10 (D2) RX ←</text>
+  <text x="40" y="645" class="s">TX ↔ RX 엇갈려 연결 · 모듈 기본 속도 9600이면 AT로 115200 설정</text>
+
+  <!-- ================= DRV8825 (오른쪽) ================= -->
+  <!-- 왼쪽 드라이버 -->
+  <rect x="1060" y="125" width="220" height="230" rx="8" fill="#fff" stroke="#2f6fd0" stroke-width="2"/>
+  <text x="1170" y="150" text-anchor="middle" class="h">DRV8825 (왼쪽)</text>
+  <text x="1072" y="176" class="t">STEP</text>
+  <text x="1072" y="255" class="t">DIR</text>
+  <text x="1072" y="285" class="t">EN (LOW=동작)</text>
+  <text x="1072" y="304" class="s">M0, M1 → 3.3V / M2 → GND (1/8)</text>
+  <text x="1072" y="322" class="s">RST, SLP → 3.3V</text>
+  <text x="1072" y="340" class="s">VMOT + 100 µF</text>
+
+  <!-- 오른쪽 드라이버 -->
+  <rect x="1060" y="425" width="220" height="230" rx="8" fill="#fff" stroke="#2f6fd0" stroke-width="2"/>
+  <text x="1170" y="450" text-anchor="middle" class="h">DRV8825 (오른쪽)</text>
+  <text x="1072" y="476" class="t">STEP</text>
+  <text x="1072" y="536" class="t">DIR</text>
+  <text x="1072" y="586" class="t">EN (LOW=동작)</text>
+  <text x="1072" y="604" class="s">M0, M1 → 3.3V / M2 → GND (1/8)</text>
+  <text x="1072" y="622" class="s">RST, SLP → 3.3V</text>
+  <text x="1072" y="640" class="s">VMOT + 100 µF</text>
+
+  <!-- 모터 -->
+  <rect x="1320" y="180" width="140" height="110" rx="55" fill="#eef2f7" stroke="#555" stroke-width="2"/>
+  <text x="1390" y="228" text-anchor="middle" class="h">왼쪽 모터</text>
+  <text x="1390" y="250" text-anchor="middle" class="s">KH42JM2-901</text>
+  <rect x="1320" y="480" width="140" height="110" rx="55" fill="#eef2f7" stroke="#555" stroke-width="2"/>
+  <text x="1390" y="528" text-anchor="middle" class="h">오른쪽 모터</text>
+  <text x="1390" y="550" text-anchor="middle" class="s">KH42JM2-901</text>
+  <g stroke="#555" stroke-width="3">
+    <line x1="1280" y1="225" x2="1320" y2="225"/><line x1="1280" y1="245" x2="1320" y2="245"/>
+    <line x1="1280" y1="525" x2="1320" y2="525"/><line x1="1280" y1="545" x2="1320" y2="545"/>
+  </g>
+  <text x="1390" y="310" text-anchor="middle" class="s">A, B 코일 (센터탭 미사용)</text>
+  <text x="1390" y="610" text-anchor="middle" class="s">A, B 코일 (센터탭 미사용)</text>
+
+  <!-- 모터 배선 (MCU → 드라이버) -->
+  <g class="wire">
+    <line x1="920" y1="170" x2="1060" y2="170" stroke="#2f6fd0"/>
+    <line x1="920" y1="250" x2="1060" y2="250" stroke="#7a45c8"/>
+    <polyline points="920,300 1030,300 1030,280 1060,280" stroke="#7a45c8"/>
+    <polyline points="1030,300 1030,580 1060,580" stroke="#7a45c8"/>
+    <line x1="920" y1="470" x2="1060" y2="470" stroke="#2f6fd0"/>
+    <line x1="920" y1="527" x2="1060" y2="530" stroke="#7a45c8"/>
+  </g>
+  <circle cx="1030" cy="300" r="5" fill="#7a45c8"/>
+  <!-- 핀 이름 (모터 쪽) -->
+  <g class="pin">
+    <text x="950" y="163">PA8 (D7)</text>
+    <text x="950" y="243">PB10 (D6)</text>
+    <text x="950" y="293">PB5 (D4)</text>
+    <text x="950" y="463">PC7 (D9)</text>
+    <text x="950" y="521">PB4 (D5)</text>
+  </g>
+  <text x="1040" y="345" class="s" transform="rotate(90 1040 345)">EN 공통 (두 드라이버)</text>
+
+  <!-- GND -->
+  <rect x="960" y="690" width="500" height="78" rx="6" fill="#fff4f4" stroke="#c03030"/>
+  <text x="980" y="715" class="h" fill="#a02020">GND 공통 필수</text>
+  <text x="980" y="737" class="s">Nucleo GND ═ DRV8825 GND ═ 모터 전원 GND ═ BT04-A GND</text>
+  <text x="980" y="756" class="s">빠지면 한쪽으로만 돌다가 웅웅거리며 멈춘다 (11/18 단일 모터 테스트에서 겪음)</text>
+
+  <!-- ================= 센서 바 (물리 배치) ================= -->
+  <line x1="40" y1="925" x2="1460" y2="925" stroke="#ccc"/>
+  <text x="40" y="958" class="h">센서 실제 배치 (위에서 본 모습)</text>
+  <text x="750" y="958" text-anchor="middle" class="t">▲ 앞 (진행 방향)</text>
+
+  <g class="mono">
+    <!-- 머리글 -->
+    <text x="60"  y="1000">센서</text>
+    <text x="60"  y="1030">핀</text>
+    <text x="60"  y="1060">채널</text>
+    <text x="60"  y="1090">DMA 버퍼</text>
+    <text x="60"  y="1120">가중치</text>
+  </g>
+
+  <!-- ADC1 묶음 -->
+  <rect x="190" y="978" width="560" height="155" rx="6" fill="#f4fbf5" stroke="#3a9a4a"/>
+  <text x="470" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC1 (Rank 1 → 4, 왼쪽부터)</text>
+  <!-- ADC2 묶음 -->
+  <rect x="770" y="978" width="560" height="155" rx="6" fill="#f4fbf5" stroke="#3a9a4a"/>
+  <text x="1050" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC2 (Rank 1 → 4, 오른쪽부터 = 버퍼 역순)</text>
+  <line x1="760" y1="970" x2="760" y2="1140" stroke="#c03030" stroke-dasharray="4 4"/>
+  <text x="760" y="1172" text-anchor="middle" class="s" fill="#a02020">중심 (error = 0)</text>
+
+  <g class="mono" text-anchor="middle">
+    <!-- S1~S4 -->
+    <text x="260" y="1000" font-weight="bold">S1</text><text x="400" y="1000" font-weight="bold">S2</text><text x="540" y="1000" font-weight="bold">S3</text><text x="680" y="1000" font-weight="bold">S4</text>
+    <text x="260" y="1030">PB14</text><text x="400" y="1030">PB12</text><text x="540" y="1030">PB1</text><text x="680" y="1030">PB0</text>
+    <text x="260" y="1060">IN5</text><text x="400" y="1060">IN11</text><text x="540" y="1060">IN12</text><text x="680" y="1060">IN15</text>
+    <text x="260" y="1090">buf1[0]</text><text x="400" y="1090">buf1[1]</text><text x="540" y="1090">buf1[2]</text><text x="680" y="1090">buf1[3]</text>
+    <text x="260" y="1120">−7</text><text x="400" y="1120">−5</text><text x="540" y="1120">−3</text><text x="680" y="1120">−1</text>
+    <!-- S5~S8 -->
+    <text x="840" y="1000" font-weight="bold">S5</text><text x="980" y="1000" font-weight="bold">S6</text><text x="1120" y="1000" font-weight="bold">S7</text><text x="1260" y="1000" font-weight="bold">S8</text>
+    <text x="840" y="1030">PA4</text><text x="980" y="1030">PB2</text><text x="1120" y="1030">PC5</text><text x="1260" y="1030">PC4</text>
+    <text x="840" y="1060">IN17</text><text x="980" y="1060">IN12</text><text x="1120" y="1060">IN11</text><text x="1260" y="1060">IN5</text>
+    <text x="840" y="1090">buf2[3]</text><text x="980" y="1090">buf2[2]</text><text x="1120" y="1090">buf2[1]</text><text x="1260" y="1090">buf2[0]</text>
+    <text x="840" y="1120">+1</text><text x="980" y="1120">+3</text><text x="1120" y="1120">+5</text><text x="1260" y="1120">+7</text>
+  </g>
+</svg>

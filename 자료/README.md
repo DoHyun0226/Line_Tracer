@@ -10,6 +10,14 @@
 | [drv8825.pdf](drv8825.pdf) | DRV8825 스테퍼 드라이버 |
 | [tcrt5000.pdf](tcrt5000.pdf) | TCRT5000 적외선 광센서 |
 
+## 배선
+
+| 파일 | 내용 |
+|---|---|
+| [Step_Line_Tracer_배선도.svg](Step_Line_Tracer_배선도.svg) | Step_Line_Tracer 핀 배치와 구성 (2026-11-19). 타이머·DRV8825, 센서 8개·ADC 채널·DMA 버퍼 순서, USART1·BT04-A, 버튼·LED |
+| [drv8825_배선.png](drv8825_배선.png) | DRV8825 모듈 배선 그림 |
+| [Unipolar-스텝모터를-Bipolar로-사용하기.pdf](Unipolar-스텝모터를-Bipolar로-사용하기.pdf) | 6선 유니폴라 스텝모터(KH42JM2-901)를 바이폴라 드라이버로 쓰는 방법 |
+
 ## 구매 자료
 
 | 파일 | 내용 |
