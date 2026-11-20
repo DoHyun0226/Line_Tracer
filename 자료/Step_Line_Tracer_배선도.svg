@@ -13,27 +13,29 @@
 
   <!-- 제목 -->
   <text x="40" y="42" class="title">Step_Line_Tracer 배선도 (NUCLEO-G474RE)</text>
-  <text x="40" y="66" class="sub">2026-11-19 기준 CubeMX(.ioc) 설정 · 센서 8개 · DRV8825 1/8 마이크로스텝 · 핀 옆 괄호는 Arduino 헤더 번호</text>
+  <text x="40" y="66" class="sub">2026-11-20 기준 CubeMX(.ioc) 설정 · 센서 10개 · DRV8825 1/8 마이크로스텝 · 핀 옆 괄호는 Arduino 헤더 번호</text>
 
   <!-- ================= MCU ================= -->
   <rect x="560" y="95" width="380" height="800" rx="10" fill="#f3f4f6" stroke="#555" stroke-width="2"/>
   <text x="750" y="122" text-anchor="middle" class="h">STM32G474RE (170 MHz)</text>
 
   <!-- 내부 블록: ADC1 -->
-  <rect x="580" y="135" width="170" height="145" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
+  <rect x="580" y="135" width="170" height="175" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
   <text x="665" y="155" text-anchor="middle" class="h" fill="#2c7a39">ADC1 + DMA</text>
   <text x="590" y="174" class="s">IN5  Rank1 → buf1[0]</text>
-  <text x="590" y="214" class="s">IN11 Rank2 → buf1[1]</text>
-  <text x="590" y="254" class="s">IN12 Rank3 → buf1[2]</text>
-  <text x="590" y="273" class="s">IN15 Rank4 → buf1[3]</text>
+  <text x="590" y="204" class="s">IN11 Rank2 → buf1[1]</text>
+  <text x="590" y="234" class="s">IN12 Rank3 → buf1[2]</text>
+  <text x="590" y="264" class="s">IN15 Rank4 → buf1[3]</text>
+  <text x="590" y="294" class="s">IN1  Rank5 → buf1[4]</text>
 
   <!-- 내부 블록: ADC2 -->
-  <rect x="580" y="320" width="170" height="145" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
-  <text x="665" y="340" text-anchor="middle" class="h" fill="#2c7a39">ADC2 + DMA</text>
-  <text x="590" y="359" class="s">IN17 Rank4 → buf2[3]</text>
-  <text x="590" y="399" class="s">IN12 Rank3 → buf2[2]</text>
-  <text x="590" y="439" class="s">IN11 Rank2 → buf2[1]</text>
-  <text x="590" y="458" class="s">IN5  Rank1 → buf2[0]</text>
+  <rect x="580" y="325" width="170" height="175" rx="6" fill="#e3f4e6" stroke="#3a9a4a"/>
+  <text x="665" y="345" text-anchor="middle" class="h" fill="#2c7a39">ADC2 + DMA</text>
+  <text x="590" y="364" class="s">IN5  Rank1 → buf2[0]</text>
+  <text x="590" y="394" class="s">IN11 Rank2 → buf2[1]</text>
+  <text x="590" y="424" class="s">IN12 Rank3 → buf2[2]</text>
+  <text x="590" y="454" class="s">IN17 Rank4 → buf2[3]</text>
+  <text x="590" y="484" class="s">IN3  Rank5 → buf2[4]</text>
 
   <!-- 내부 블록: USART1 -->
   <rect x="580" y="535" width="170" height="85" rx="6" fill="#fdebd8" stroke="#d07a1e"/>
@@ -81,45 +83,51 @@
   <text x="776" y="828" class="s">→ 상태 표시</text>
 
   <!-- ================= 센서 (왼쪽) ================= -->
-  <text x="40" y="118" class="h">TCRT5000 × 8</text>
-  <text x="40" y="136" class="s">흰색 ≈ 200, 검정 ≈ 2000 (11/10 실험값)</text>
+  <text x="40" y="118" class="h">TCRT5000 × 10</text>
+  <text x="40" y="136" class="s">흰색 ≈ 200, 검정 ≈ 2000 (11/10 실험값) · 괄호는 위치(mm)</text>
 
-  <!-- ADC1 센서 -->
+  <!-- ADC1 센서 (왼쪽 5개) -->
   <g class="t">
-    <rect x="40" y="158" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="178" text-anchor="middle">S1  (−7)</text>
-    <rect x="40" y="198" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="218" text-anchor="middle">S2  (−5)</text>
-    <rect x="40" y="238" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="258" text-anchor="middle">S3  (−3)</text>
-    <rect x="40" y="278" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="298" text-anchor="middle">S4  (−1)</text>
+    <rect x="40" y="158" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="175" text-anchor="middle">S1  (−57.5)</text>
+    <rect x="40" y="188" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="205" text-anchor="middle">S2  (−45)</text>
+    <rect x="40" y="218" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="235" text-anchor="middle">S3  (−32.5)</text>
+    <rect x="40" y="248" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="265" text-anchor="middle">S4  (−20)</text>
+    <rect x="40" y="278" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="295" text-anchor="middle">S5  (−7.5)</text>
   </g>
-  <!-- ADC2 센서 -->
+  <!-- ADC2 센서 (오른쪽 5개) -->
   <g class="t">
-    <rect x="40" y="343" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="363" text-anchor="middle">S5  (+1)</text>
-    <rect x="40" y="383" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="403" text-anchor="middle">S6  (+3)</text>
-    <rect x="40" y="423" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="443" text-anchor="middle">S7  (+5)</text>
-    <rect x="40" y="463" width="110" height="30" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="483" text-anchor="middle">S8  (+7)</text>
+    <rect x="40" y="348" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="365" text-anchor="middle">S6  (+7.5)</text>
+    <rect x="40" y="378" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="395" text-anchor="middle">S7  (+20)</text>
+    <rect x="40" y="408" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="425" text-anchor="middle">S8  (+32.5)</text>
+    <rect x="40" y="438" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="455" text-anchor="middle">S9  (+45)</text>
+    <rect x="40" y="468" width="110" height="24" rx="5" fill="#fff" stroke="#3a9a4a"/><text x="95" y="485" text-anchor="middle">S10 (+57.5)</text>
   </g>
 
   <!-- 센서 배선 (센서 → 핀) -->
   <g class="wire" stroke="#3a9a4a">
-    <polyline points="150,173 400,173 400,170 580,170"/>
-    <polyline points="150,213 580,210"/>
-    <polyline points="150,253 580,250"/>
-    <polyline points="150,293 400,293 400,269 580,269"/>
-    <polyline points="150,358 400,358 400,355 580,355"/>
-    <polyline points="150,398 580,395"/>
-    <polyline points="150,438 580,435"/>
-    <polyline points="150,478 400,478 400,454 580,454"/>
+    <line x1="150" y1="170" x2="580" y2="170"/>
+    <line x1="150" y1="200" x2="580" y2="200"/>
+    <line x1="150" y1="230" x2="580" y2="230"/>
+    <line x1="150" y1="260" x2="580" y2="260"/>
+    <line x1="150" y1="290" x2="580" y2="290"/>
+    <line x1="150" y1="360" x2="580" y2="360"/>
+    <line x1="150" y1="390" x2="580" y2="390"/>
+    <line x1="150" y1="420" x2="580" y2="420"/>
+    <line x1="150" y1="450" x2="580" y2="450"/>
+    <line x1="150" y1="480" x2="580" y2="480"/>
   </g>
   <!-- 핀 이름 (센서 쪽) -->
   <g class="pin">
     <text x="545" y="165" text-anchor="end">PB14</text>
-    <text x="545" y="205" text-anchor="end">PB12</text>
-    <text x="545" y="245" text-anchor="end">PB1</text>
-    <text x="545" y="286" text-anchor="end">PB0</text>
-    <text x="545" y="350" text-anchor="end">PA4</text>
-    <text x="545" y="390" text-anchor="end">PB2</text>
-    <text x="545" y="430" text-anchor="end">PC5</text>
-    <text x="545" y="471" text-anchor="end">PC4</text>
+    <text x="545" y="195" text-anchor="end">PB12</text>
+    <text x="545" y="225" text-anchor="end">PB1</text>
+    <text x="545" y="255" text-anchor="end">PB0</text>
+    <text x="545" y="285" text-anchor="end">PA0</text>
+    <text x="545" y="355" text-anchor="end">PC4</text>
+    <text x="545" y="385" text-anchor="end">PC5</text>
+    <text x="545" y="415" text-anchor="end">PB2</text>
+    <text x="545" y="445" text-anchor="end">PA4</text>
+    <text x="545" y="475" text-anchor="end">PA6</text>
   </g>
 
   <!-- ================= 블루투스 (왼쪽 아래) ================= -->
@@ -210,30 +218,30 @@
     <text x="60"  y="1030">핀</text>
     <text x="60"  y="1060">채널</text>
     <text x="60"  y="1090">DMA 버퍼</text>
-    <text x="60"  y="1120">가중치</text>
+    <text x="60"  y="1120">위치(mm)</text>
   </g>
 
   <!-- ADC1 묶음 -->
   <rect x="190" y="978" width="560" height="155" rx="6" fill="#f4fbf5" stroke="#3a9a4a"/>
-  <text x="470" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC1 (Rank 1 → 4, 왼쪽부터)</text>
+  <text x="470" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC1 (Rank 1 → 5, 왼쪽부터)</text>
   <!-- ADC2 묶음 -->
   <rect x="770" y="978" width="560" height="155" rx="6" fill="#f4fbf5" stroke="#3a9a4a"/>
-  <text x="1050" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC2 (Rank 1 → 4, 오른쪽부터 = 버퍼 역순)</text>
+  <text x="1050" y="1150" text-anchor="middle" class="s" fill="#2c7a39">ADC2 (Rank 1 → 5, 왼쪽부터 · 역순 없음)</text>
   <line x1="760" y1="970" x2="760" y2="1140" stroke="#c03030" stroke-dasharray="4 4"/>
   <text x="760" y="1172" text-anchor="middle" class="s" fill="#a02020">중심 (error = 0)</text>
 
   <g class="mono" text-anchor="middle">
-    <!-- S1~S4 -->
-    <text x="260" y="1000" font-weight="bold">S1</text><text x="400" y="1000" font-weight="bold">S2</text><text x="540" y="1000" font-weight="bold">S3</text><text x="680" y="1000" font-weight="bold">S4</text>
-    <text x="260" y="1030">PB14</text><text x="400" y="1030">PB12</text><text x="540" y="1030">PB1</text><text x="680" y="1030">PB0</text>
-    <text x="260" y="1060">IN5</text><text x="400" y="1060">IN11</text><text x="540" y="1060">IN12</text><text x="680" y="1060">IN15</text>
-    <text x="260" y="1090">buf1[0]</text><text x="400" y="1090">buf1[1]</text><text x="540" y="1090">buf1[2]</text><text x="680" y="1090">buf1[3]</text>
-    <text x="260" y="1120">−7</text><text x="400" y="1120">−5</text><text x="540" y="1120">−3</text><text x="680" y="1120">−1</text>
-    <!-- S5~S8 -->
-    <text x="840" y="1000" font-weight="bold">S5</text><text x="980" y="1000" font-weight="bold">S6</text><text x="1120" y="1000" font-weight="bold">S7</text><text x="1260" y="1000" font-weight="bold">S8</text>
-    <text x="840" y="1030">PA4</text><text x="980" y="1030">PB2</text><text x="1120" y="1030">PC5</text><text x="1260" y="1030">PC4</text>
-    <text x="840" y="1060">IN17</text><text x="980" y="1060">IN12</text><text x="1120" y="1060">IN11</text><text x="1260" y="1060">IN5</text>
-    <text x="840" y="1090">buf2[3]</text><text x="980" y="1090">buf2[2]</text><text x="1120" y="1090">buf2[1]</text><text x="1260" y="1090">buf2[0]</text>
-    <text x="840" y="1120">+1</text><text x="980" y="1120">+3</text><text x="1120" y="1120">+5</text><text x="1260" y="1120">+7</text>
+    <!-- S1~S5 (ADC1) -->
+    <text x="246" y="1000" font-weight="bold">S1</text><text x="358" y="1000" font-weight="bold">S2</text><text x="470" y="1000" font-weight="bold">S3</text><text x="582" y="1000" font-weight="bold">S4</text><text x="694" y="1000" font-weight="bold">S5</text>
+    <text x="246" y="1030">PB14</text><text x="358" y="1030">PB12</text><text x="470" y="1030">PB1</text><text x="582" y="1030">PB0</text><text x="694" y="1030">PA0</text>
+    <text x="246" y="1060">IN5</text><text x="358" y="1060">IN11</text><text x="470" y="1060">IN12</text><text x="582" y="1060">IN15</text><text x="694" y="1060">IN1</text>
+    <text x="246" y="1090">buf1[0]</text><text x="358" y="1090">buf1[1]</text><text x="470" y="1090">buf1[2]</text><text x="582" y="1090">buf1[3]</text><text x="694" y="1090">buf1[4]</text>
+    <text x="246" y="1120">−57.5</text><text x="358" y="1120">−45</text><text x="470" y="1120">−32.5</text><text x="582" y="1120">−20</text><text x="694" y="1120">−7.5</text>
+    <!-- S6~S10 (ADC2) -->
+    <text x="826" y="1000" font-weight="bold">S6</text><text x="938" y="1000" font-weight="bold">S7</text><text x="1050" y="1000" font-weight="bold">S8</text><text x="1162" y="1000" font-weight="bold">S9</text><text x="1274" y="1000" font-weight="bold">S10</text>
+    <text x="826" y="1030">PC4</text><text x="938" y="1030">PC5</text><text x="1050" y="1030">PB2</text><text x="1162" y="1030">PA4</text><text x="1274" y="1030">PA6</text>
+    <text x="826" y="1060">IN5</text><text x="938" y="1060">IN11</text><text x="1050" y="1060">IN12</text><text x="1162" y="1060">IN17</text><text x="1274" y="1060">IN3</text>
+    <text x="826" y="1090">buf2[0]</text><text x="938" y="1090">buf2[1]</text><text x="1050" y="1090">buf2[2]</text><text x="1162" y="1090">buf2[3]</text><text x="1274" y="1090">buf2[4]</text>
+    <text x="826" y="1120">+7.5</text><text x="938" y="1120">+20</text><text x="1050" y="1120">+32.5</text><text x="1162" y="1120">+45</text><text x="1274" y="1120">+57.5</text>
   </g>
 </svg>

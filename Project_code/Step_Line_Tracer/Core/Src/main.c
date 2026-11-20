@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdbool.h>
 #include "stepper.h"
 #include "tcrt5000.h"
 #include "pid.h"
@@ -45,8 +46,8 @@
 #define MOTOR_TEST          1
 #define TEST_HZ             (1.0f * STEPPER_STEPS_PER_REV)   // 초당 1회전
 #define TEST_ACCEL_HZ       (10.0f * STEPPER_MICROSTEP)      // 10 ms마다 더하는 Hz (1/8 모드: 80 Hz = 8000 Hz/s = 초당 5바퀴씩 가속)
-#define TEST_HOLD_MS        2000                      // 최고 속도 유지 시간
-#define TEST_PAUSE_MS       1000                      // 방향 바꾸기 전 쉬는 시간
+#define TEST_HOLD_MS        2000                      		 // 최고 속도 유지 시간
+#define TEST_PAUSE_MS       1000                      		 // 방향 바꾸기 전 쉬는 시간
 
 /* USER CODE END PD */
 
@@ -58,13 +59,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+static volatile bool pid_on = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static void Motor_Test_Run(float target_hz);
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 
 /* USER CODE END PFP */
 
@@ -85,9 +87,10 @@ int main(void)
 
   /* =====   PID   ===== */
   /* PID 계수, 출력 제한, 내부 상태(gain_p/i/d, err_prev)는 pid.h / pid.c에 있음 */
-  float err_curr; 						// 현재 오차 (라인 위치, -7 ~ +7, 0 = 가운데) -> PID 입력
-  uint32_t dt; 							// 주기 간격 (ms)
-  uint32_t last_tick;					// 지난 주기의 HAL_GetTick() 값 (HAL_GetTick()과 같은 uint32_t)
+  float err_curr; 										// 현재 오차 (라인 위치 mm, -57.5 ~ +57.5, 0 = 가운데) -> PID 입력
+  uint32_t dt; 											// 주기 간격 (ms)
+  uint32_t last_tick;									// 지난 주기의 HAL_GetTick() 값 (HAL_GetTick()과 같은 uint32_t)
+  const uint16_t *tcrt_raw_array_uart; 	// uart 전송 용도 (get_tcrt_raw_array()가 읽기 전용 주소를 주므로 const)
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -126,6 +129,14 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  if (pid_on == false) // 정지 상태 동작
+	  {
+
+	  }
+	  else // 주행 상태 동작
+	  {
+
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -217,6 +228,24 @@ static void Motor_Test_Run(float target_hz)
   }
 }
 
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	static uint32_t User_btn_Pin_last_tick = 0;
+	if (GPIO_Pin == User_btn_Pin)
+	{
+		if (HAL_GetTick() - User_btn_Pin_last_tick < 200)
+		{
+			return;
+		}
+		else
+		{
+			User_btn_Pin_last_tick = HAL_GetTick();
+			pid_on = !pid_on;
+		}
+	}
+
+}
 /* USER CODE END 4 */
 
 /**

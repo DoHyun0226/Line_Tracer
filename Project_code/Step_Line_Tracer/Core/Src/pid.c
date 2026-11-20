@@ -80,13 +80,6 @@ void update_gain(uint32_t dt_ms)
 }
 
 
-void pid_task(uint32_t dt_ms)
-{
-	update_gain(dt_ms);
-	Stepper_RampTo(STEPPER_RIGHT, base_hz + gain);
-	Stepper_RampTo(STEPPER_LEFT, base_hz - gain);
-}
-
 /**
   * @brief  목표 속도를 향해 한 걸음 가속/감속 (탈조 방지용 가속 제한)
   *         매 제어 주기마다 (PID 계산 직후) 같은 간격으로 호출한다.
@@ -128,4 +121,23 @@ void Stepper_RampTo(Stepper_Id id, float target_hz)
 	}
 
 	Stepper_SetSpeed(id, new_acc);   /* Hz -> ARR, DIR 처리는 stepper가 함 */
+}
+
+
+/**
+  * @brief  제어 주기 한 번 실행: 센서 -> PID -> 좌우 목표 속도 -> 가속 제한 후 모터에 적용
+  *
+  *         gain > 0 (라인이 왼쪽) : 왼쪽 느리게, 오른쪽 빠르게 -> 왼쪽으로 꺾음
+  *         gain < 0 (라인이 오른쪽): 왼쪽 빠르게, 오른쪽 느리게 -> 오른쪽으로 꺾음
+  *         두 바퀴 평균은 항상 base_hz -> 앞으로 가는 속도는 그대로
+  *
+  * @param  dt_ms  지난 호출과의 시간 간격 (ms). main에서 CONTROL_PERIOD_MS(10)마다 부르고 그 값을 넘긴다.
+  * @note   주기마다 정확히 한 번만 부를 것 (PID 상태와 가속 제한이 호출 횟수 기준).
+  *         로봇이 라인에서 도망가면 아래 두 줄의 +, - 를 서로 바꾼다.
+  */
+void pid_task(uint32_t dt_ms)
+{
+	update_gain(dt_ms);                                /* 1. 라인 위치 읽고 gain 계산 */
+	Stepper_RampTo(STEPPER_RIGHT, base_hz + gain);     /* 2. 오른쪽 목표 = 기본 속도 + gain */
+	Stepper_RampTo(STEPPER_LEFT, base_hz - gain);      /* 3. 왼쪽 목표   = 기본 속도 - gain */
 }

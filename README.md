@@ -7,7 +7,7 @@ NUCLEO-G474RE 보드와 스텝모터로 라인트레이서를 만드는 프로�
 - 개발 환경: STM32CubeIDE (HAL)
 - 구동 모터: KH42JM2-901 2개
 - 스테퍼 드라이버: DRV8825 2개 (1/8 마이크로스텝)
-- 라인 센서: TCRT5000 적외선 광센서 8개
+- 라인 센서: TCRT5000 적외선 광센서 10개
 
 ## 폴더 구성
 
@@ -22,7 +22,7 @@ NUCLEO-G474RE 보드와 스텝모터로 라인트레이서를 만드는 프로�
 
 ### Step_Line_Tracer (본 프로젝트)
 
-TCRT5000 8개(ADC1, ADC2 + DMA)로 라인 위치(mm)를 구하고, PID로 좌우 KH42JM2-901 속도를 정한다.
+TCRT5000 10개(ADC1, ADC2 + DMA)로 라인 위치(mm)를 구하고, PID로 좌우 KH42JM2-901 속도를 정한다.
 모듈은 `tcrt5000` (센서) → `pid` (제어, 가속 제한) → `stepper` (모터 구동)로 나뉘어 있다.
 빌드까지 확인했고, 하드웨어 주행은 아직이다. 세부 내용은 [Step_Line_Tracer README](Project_code/Step_Line_Tracer/README.md),
 배선은 [Step_Line_Tracer_배선도.svg](자료/Step_Line_Tracer_배선도.svg)를 참고.
@@ -100,7 +100,7 @@ main의 while(1)
 - [x] TCRT5000 2개를 ADC1 + DMA로 읽고 블루투스로 출력 (2026-11-10)
 - [x] DRV8825로 KH42JM2-901 1개 구동 (2026-11-18)
 - [x] Step_Line_Tracer: CubeMX 핀 배치, 모터 2개 / 센서 8개 / PID 코드 작성, 빌드 확인 (2026-11-19)
-- [ ] TCRT5000 8개 흰색/검은색 기준값 측정
+- [ ] TCRT5000 10개 흰색/검은색 기준값 측정
 - [ ] 버튼 시작/정지, 라인 놓침 정지, 교차로와 정지선 처리
 - [ ] 하드웨어 주행 시험과 PID 튜닝
 - [x] 전원부(3S LiPo, 5V 강압) 구성

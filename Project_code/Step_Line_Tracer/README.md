@@ -1,6 +1,6 @@
 # Step_Line_Tracer
 
-라인트레이서 본 프로젝트이다. TCRT5000 8개로 라인 위치를 구하고, PID로 좌우 스텝모터 속도를 정한다.
+라인트레이서 본 프로젝트이다. TCRT5000 10개로 라인 위치를 구하고, PID로 좌우 스텝모터 속도를 정한다.
 **코드는 빌드까지 확인했고, 하드웨어 주행은 아직 해 보지 않았다** (2026-11-19 기준).
 
 배선 전체 그림: [Step_Line_Tracer_배선도.svg](../../자료/Step_Line_Tracer_배선도.svg)
@@ -8,7 +8,7 @@
 ## 전체 흐름
 
 ```
-TCRT5000 8개 ── ADC1/ADC2 + DMA (CPU 없이 계속 갱신)
+TCRT5000 10개 ── ADC1/ADC2 + DMA (CPU 없이 계속 갱신)
    │
 tcrt5000.c   get_current_pos()      정규화(0~1000) → 가장 검은 센서와 양옆 3개로 가중평균 → 라인 위치(mm)
    │
@@ -38,8 +38,8 @@ stepper.c    Stepper_SetSpeed()     Hz → ARR, DIR 처리 → TIM1 / TIM3 PWM �
 | 오른쪽 STEP | PC7 (D9) | TIM3_CH2, PWM |
 | 오른쪽 DIR | PB4 (D5) | GPIO (`RM_Dir`) |
 | EN (두 드라이버 공통) | PB5 (D4) | GPIO (`Motor_en`), LOW = 동작, 부팅 시 HIGH |
-| 센서 S1~S4 | PB14, PB12, PB1, PB0 | ADC1 IN5, IN11, IN12, IN15 |
-| 센서 S5~S8 | PA4, PB2, PC5, PC4 | ADC2 IN17, IN12, IN11, IN5 (버퍼 역순) |
+| 센서 S1~S5 | PB14, PB12, PB1, PB0, PA0 | ADC1 IN5, IN11, IN12, IN15, IN1 (Rank 1~5, 왼쪽부터) |
+| 센서 S6~S10 | PC4, PC5, PB2, PA4, PA6 | ADC2 IN5, IN11, IN12, IN17, IN3 (Rank 1~5, 왼쪽부터) |
 | 블루투스 | PA9 TX, PA10 RX | USART1, 115200 bps |
 | 버튼 | PC13 | EXTI13 Rising |
 | LED | PA5 | GPIO (`State_LED`) |
@@ -63,5 +63,5 @@ stepper.c    Stepper_SetSpeed()     Hz → ARR, DIR 처리 → TIM1 / TIM3 PWM �
 - [ ] main 루프: 10 ms마다 `pid_task(10)`, `MOTOR_TEST` 0으로
 - [ ] 버튼으로 IDLE ⇄ RUN 전환 (EN 켜고 끄기, PID 상태 리셋)
 - [ ] 라인을 놓치면 200 ms 동안 마지막 방향으로 꺾다가 정지 (pid로 옮길 예정)
-- [ ] 교차로 처리 (검정 센서가 많으면 8개 전부로 평균), 정지선 감지
+- [ ] 교차로 처리 (검정 센서가 많으면 10개 전부로 평균), 정지선 감지
 - [ ] 하드웨어 시험: 모터 방향, 센서 raw 값, P 제어만으로 저속 주행

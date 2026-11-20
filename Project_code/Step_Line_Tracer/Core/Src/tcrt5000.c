@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
   * @file    tcrt5000.c
-  * @brief   TCRT5000 센서 8개 읽기 (ADC1, ADC2 + DMA)
+  * @brief   TCRT5000 센서 10개 읽기 (ADC1, ADC2 + DMA)
   *          Created on: 2026. 11. 19.  Author: yoodo
   ******************************************************************************
   * ADC와 DMA 초기화는 CubeMX가 한다 (MX_DMA_Init, MX_ADC1_Init, MX_ADC2_Init).
@@ -18,7 +18,7 @@
  * (11/10 실험: 흰 종이 ≈ 200, 두꺼운 검정 ≈ 2000)
  *
  * 사용: tcrt_min_max[id][TCRT_MIN], tcrt_min_max[id][TCRT_MAX]
- *       첫 번째 [ ] = 센서 번호 (TCRT_ID: TCRT_S1 = 0 ... TCRT_S8 = 7)
+ *       첫 번째 [ ] = 센서 번호 (TCRT_ID: TCRT_S1 = 0 ... TCRT_S10 = 9)
  *       두 번째 [ ] = 0: 흰색(MIN), 1: 검정(MAX) */
 enum { TCRT_MIN = 0, TCRT_MAX = 1 };
 
@@ -33,6 +33,8 @@ static const uint16_t tcrt_min_max[SENSOR_NUM][2] =
   [TCRT_S6] = { 100, 2000 },
   [TCRT_S7] = { 100, 2000 },
   [TCRT_S8] = { 100, 2000 },
+  [TCRT_S9] = { 100, 2000 },
+  [TCRT_S10] = { 100, 2000 },
 };
 
 /* 라인 판정 기준: 가장 검은 센서의 정규화 값이 이보다 작으면 "라인 없음" (0 ~ 1000, 튜닝값) */
@@ -42,11 +44,13 @@ static const uint16_t tcrt_min_max[SENSOR_NUM][2] =
 /* =====   TCRT5000 (ADC + DMA)   ===== */
 /* DMA가 백그라운드에서 이 버퍼를 계속 덮어쓰므로 volatile:
 * 컴파일러가 값을 캐시하지 말고 매번 메모리에서 다시 읽게 한다.
-* 인덱스 순서는 위 센서 그림 참고 (b1[k]와 b2[k]는 중심 기준 좌우 대칭 쌍). */
-static volatile uint16_t buf_tcrt_1[TCRT5000_NUM_ADC1] = {0,}; // ADC1 값 (S1~S4), DMA가 갱신
-static volatile uint16_t buf_tcrt_2[TCRT5000_NUM_ADC2] = {0,}; // ADC2 값 (S8~S5, 역순), DMA가 갱신
+* 인덱스 순서는 tcrt5000.h 센서 그림 참고 (b1[k]와 b2[k]는 같은 순번, 둘 다 왼쪽부터). */
+static volatile uint16_t buf_tcrt_1[TCRT5000_NUM_ADC1] = {0,}; // ADC1 값 (S1~S5), DMA가 갱신
+static volatile uint16_t buf_tcrt_2[TCRT5000_NUM_ADC2] = {0,}; // ADC2 값 (S6~S10), DMA가 갱신
 
+static uint16_t tcrt_raw_array[SENSOR_NUM] = {0,}; // 외부 파일에서 sensor raw값 점검할 때 사용, 제어에는 사용되지 않음
 static float tcrt_norm_array[SENSOR_NUM] = {0,};
+
 
 /* 센서 하나에 필요한 정보 묶음 */
 typedef struct
@@ -56,18 +60,21 @@ typedef struct
 } Tcrt;
 
 /* 센서 표. TCRT_ID로 칸을 고른다 (예: tcrt[TCRT_S5].pos).
- * ADC2 버퍼는 역순이라 S5 = buf_tcrt_2[3], S8 = buf_tcrt_2[0]: 이 역순 처리는 이 표 한 곳에서만 한다.
+ * S1~S5 = buf_tcrt_1[0~4], S6~S10 = buf_tcrt_2[0~4] (두 ADC 모두 Rank 1이 왼쪽, 역순 없음).
+ * 센서와 버퍼 칸의 연결은 이 표 한 곳에서만 한다.
  * 값 읽기: *tcrt[TCRT_S5].raw  (raw가 버퍼 칸의 주소라서 * 로 꺼냄) */
 static const Tcrt tcrt[SENSOR_NUM] =
 {
-  [TCRT_S1] = { &buf_tcrt_1[0], -55.0f },
-  [TCRT_S2] = { &buf_tcrt_1[1], -39.5f },
-  [TCRT_S3] = { &buf_tcrt_1[2], -24.0f },
-  [TCRT_S4] = { &buf_tcrt_1[3],  -8.5f },
-  [TCRT_S5] = { &buf_tcrt_2[3],   8.5f },
-  [TCRT_S6] = { &buf_tcrt_2[2],  24.0f },
-  [TCRT_S7] = { &buf_tcrt_2[1],  39.5f },
-  [TCRT_S8] = { &buf_tcrt_2[0],  55.0f },
+  [TCRT_S1] = { &buf_tcrt_1[0],  -57.5f},
+  [TCRT_S2] = { &buf_tcrt_1[1],  -45.0f},
+  [TCRT_S3] = { &buf_tcrt_1[2],  -32.5f},
+  [TCRT_S4] = { &buf_tcrt_1[3],  -20.0f},
+  [TCRT_S5] = { &buf_tcrt_1[4],   -7.5f},
+  [TCRT_S6] = { &buf_tcrt_2[0],    7.5f},
+  [TCRT_S7] = { &buf_tcrt_2[1],   20.0f},
+  [TCRT_S8] = { &buf_tcrt_2[2],   32.5f},
+  [TCRT_S9] = { &buf_tcrt_2[3],   45.0f},
+  [TCRT_S10] = {&buf_tcrt_2[4],   57.5f},
 };
 
 
@@ -122,24 +129,47 @@ void tcrt5000_init(void)
 
 /**
   * @brief  센서 위치 읽기
-  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S8, 왼쪽 -> 오른쪽)
+  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S10, 왼쪽 -> 오른쪽)
   * @retval 센서 위치 (mm, 가운데 = 0, - = 왼쪽, + = 오른쪽)
   */
 float get_tcrt_pos(TCRT_ID id)
 {
-	return tcrt[id].pos;          // get_tcrt_pos(TCRT_S5) → 8.5
+	return tcrt[id].pos;          // get_tcrt_pos(TCRT_S5) → -7.5
 }
 
 /**
   * @brief  센서의 ADC 원래 값 읽기 (DMA 버퍼의 최신 값)
-  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S8)
+  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S10)
   * @retval ADC 값 (12bit, 0 ~ 4095). 흰색일수록 작고 검정일수록 큼
-  * @note   ADC2 버퍼의 역순은 tcrt[] 표에서 처리되므로 id만 넣으면 된다.
+  * @note   센서와 버퍼 칸의 연결은 tcrt[] 표에서 처리되므로 id만 넣으면 된다.
   *         흰/검 보정값(tcrt_min_max)을 잴 때 이 값을 블루투스로 찍어 본다.
   */
 uint16_t get_tcrt_raw(TCRT_ID id)
 {
 	return *(tcrt[id].raw);   /* raw는 버퍼 칸의 주소 -> * 로 값을 꺼냄 */
+}
+
+/**
+  * @brief  센서 10개 raw 값을 tcrt_raw_array에 갱신 ([0]=S1 ~ [9]=S10)
+  * @note   정규화 세팅(흰/검 값 측정)할 때만 호출. 주행 중에는 쓰지 않음.
+  */
+void update_tcrt_raw_array(void)
+{
+	int i = 0;
+	while (i < SENSOR_NUM)
+	{
+		tcrt_raw_array[i] = get_tcrt_raw(i);
+		i++;
+	}
+}
+
+/**
+  * @brief  raw 배열 주소 돌려주기 (갱신은 하지 않음)
+  * @retval 읽기 전용 주소. 값은 마지막 update_tcrt_raw_array() 때의 값
+  */
+const uint16_t *get_tcrt_raw_array(void)
+{
+	return tcrt_raw_array;
 }
 
 /**
@@ -150,7 +180,7 @@ uint16_t get_tcrt_raw(TCRT_ID id)
   *                   max - min
   *
   *         예 (min 100, max 2000): raw 100 -> 0,  raw 1050 -> 500,  raw 2000 -> 1000
-  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S8)
+  * @param  id  센서 번호 (TCRT_S1 ~ TCRT_S10)
   * @retval 0 (흰색) ~ 1000 (검정). 범위를 넘으면 0 또는 1000으로 자름
   * @note   표 값이 잘못되면 (max <= min) 0을 돌려준다 (그 센서는 흰색 취급).
   *         Error_Handler()를 쓰지 않는 이유: 주행 중에 불리는 함수라 멈추면 모터가 폭주한다.
@@ -186,7 +216,7 @@ float  get_tcrt_norm(TCRT_ID id)
 }
 
 
-void get_tcrt_norm_array(void)
+void update_tcrt_norm_array(void)
 {
 	int i = 0;
 	while (i < SENSOR_NUM)
@@ -196,14 +226,19 @@ void get_tcrt_norm_array(void)
 	}
 }
 
+const float *get_tcrt_norm_array(void)
+{
+	return tcrt_norm_array;
+}
+
 
 /**
   * @brief  정규화 값이 가장 큰 (가장 검은) 센서 번호 찾기
-  * @note   tcrt_norm_array를 읽으므로 get_tcrt_norm_array()를 먼저 불러야 한다.
+  * @note   tcrt_norm_array를 읽으므로 update_tcrt_norm_array()를 먼저 불러야 한다.
   *         값이 같으면 가운데에 더 가까운 센서가 우선 (|pos|가 작은 쪽).
-  *         예: S2와 S4가 둘 다 1000이면 -> S4 (|-8.5| < |-39.5|)
-  *         가운데에서 거리가 같은 S4(-8.5)와 S5(+8.5)가 같으면 먼저 본 S4.
-  * @retval 센서 번호 (TCRT_S1 ~ TCRT_S8)
+  *         예: S2와 S4가 둘 다 1000이면 -> S4 (|-20| < |-45|)
+  *         가운데에서 거리가 같은 S5(-7.5)와 S6(+7.5)가 같으면 먼저 본 S5.
+  * @retval 센서 번호 (TCRT_S1 ~ TCRT_S10)
   */
 static TCRT_ID get_max_norm_index(void)
 {
@@ -245,24 +280,24 @@ static TCRT_ID get_max_norm_index(void)
   *         pos = ──────────────────────     i = max_i-1, max_i, max_i+1
   *                    Σ norm[i]
   *
-  *         예: S4 = 800, S5 = 200 -> (800 x -8.5 + 200 x 8.5) / 1000 = -5.1 mm
+  *         예: S5 = 800, S6 = 200 -> (800 x -7.5 + 200 x 7.5) / 1000 = -4.5 mm
   * @retval 라인 위치 (mm, 가운데 = 0, - = 왼쪽, + = 오른쪽) -> PID의 오차로 사용
-  * @note   센서 값 갱신(get_tcrt_norm_array)도 여기서 한다. 제어 주기마다 한 번만 부를 것.
-  *         라인을 놓치면 (가장 검은 값 < TCRT_LINE_TH) 마지막으로 본 쪽 끝 위치(±55 mm)를 돌려준다.
+  * @note   센서 값 갱신(update_tcrt_norm_array)도 여기서 한다. 제어 주기마다 한 번만 부를 것.
+  *         라인을 놓치면 (가장 검은 값 < TCRT_LINE_TH) 마지막으로 본 쪽 끝 위치(±57.5 mm)를 돌려준다.
   *         -> PID가 그쪽으로 최대한 꺾어서 라인을 다시 찾게 된다.
   */
 float get_current_pos(void)
 {
 	static float last_pos = 0.0f;   /* 마지막으로 라인을 본 위치 (함수가 끝나도 유지) */
 
-	get_tcrt_norm_array();          /* 1. 센서 8개 정규화 값 갱신 */
+	update_tcrt_norm_array();          /* 1. 센서 10개 정규화 값 갱신 */
 
 	TCRT_ID max_i = get_max_norm_index();   /* 2. 가장 검은 센서 */
 
 	/* 3. 라인 놓침: 가장 검은 센서도 흰색 수준이면 계산하지 않고 마지막 방향 끝으로 */
 	if (tcrt_norm_array[max_i] < TCRT_LINE_TH)
 	{
-		return (last_pos < 0.0f) ? tcrt[TCRT_S1].pos : tcrt[TCRT_S8].pos;
+		return (last_pos < 0.0f) ? tcrt[TCRT_S1].pos : tcrt[SENSOR_NUM - 1].pos;
 	}
 
 	/* 4. 양옆 범위 (양 끝 센서면 한쪽만) */
